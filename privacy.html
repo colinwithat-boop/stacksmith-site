@@ -12,10 +12,13 @@
   h2 { font-size: 18px; margin: 28px 0 8px; }
   p, li { margin: 0 0 10px; }
   ul { padding-left: 22px; }
+  ul ul { margin-top: 8px; }
+  a { color: #2b6cb0; }
   .date { color: #5b6472; margin-bottom: 24px; }
   .legal { margin-top: 40px; padding-top: 16px; border-top: 1px solid #dfe3ea; color: #5b6472; font-size: 14px; }
   @media (prefers-color-scheme: dark) {
     body { background: #0f1115; color: #e9edf3; }
+    a { color: #7fb4ee; }
     .date, .legal { color: #98a1b0; }
     .legal { border-top-color: #282d36; }
   }
@@ -24,32 +27,43 @@
 <body>
 <main>
   <h1>Stacksmith privacy policy</h1>
-  <p class="date">Last updated: 23 September 2026</p>
+  <p class="date">Last updated: 28 September 2026</p>
 
-  <p>Stacksmith is a Magic: The Gathering card scanner and collection tracker for Android. It has no accounts and no server of its own. This page explains what the app does with data.</p>
+  <p>Stacksmith is a Magic: The Gathering card scanner and collection tracker. It has no accounts and no server of its own. This page explains what the app keeps on your phone, what it sends over the internet, and when.</p>
 
-  <h2>What stays on your device</h2>
+  <h2>What stays on your phone</h2>
   <ul>
-    <li><strong>Your collection, folders, decks and settings</strong> are stored in a database on your phone. They are never uploaded anywhere by the app. Uninstalling the app deletes them.</li>
-    <li><strong>The camera</strong> is used only to recognise cards while the Scan screen is open. Frames are analysed on the device and are not stored or sent anywhere. Nothing is recorded when the Scan screen is closed.</li>
+    <li><strong>Your collection, folders, decks, price history and settings</strong> are stored in a database on your phone. We have no server, so none of it is uploaded to us. Uninstalling the app deletes it. If Android backup is turned on for your phone, Android may include this database in your device backup with Google.</li>
+    <li><strong>The camera</strong> is used only to recognise cards while the Scan screen is open. Frames are analysed on the phone, including the text on the card. No photos or video are stored or sent anywhere.</li>
     <li><strong>CSV export</strong> creates a file only when you ask for one, and hands it to the app you choose to share it with.</li>
   </ul>
 
-  <h2>What the app requests over the internet</h2>
-  <p>The app contacts these services to fetch reference data. Requests contain the card or query being looked up and standard connection information (such as your IP address, which every internet request carries); they do not contain your collection.</p>
+  <h2>What the app sends over the internet, and when</h2>
+  <p>Every internet request carries standard connection information, such as your IP address. Beyond that, the app sends only what is listed here.</p>
   <ul>
-    <li><strong>Scryfall</strong> (scryfall.com): card data, prices, set information and card images.</li>
-    <li><strong>Commander Spellbook</strong> (commanderspellbook.com): combo information.</li>
-    <li><strong>MTGGoldfish</strong> (mtggoldfish.com): headlines shown on the Home tab.</li>
-    <li><strong>Google Play</strong>: to process the optional one-time Pro purchase and to check whether it has been made. Google's handling of payments is covered by Google's own privacy policy; the app never sees your payment details.</li>
+    <li><strong>Scryfall</strong> (scryfall.com): card data, set lists, card images, prices (TCGplayer's and Cardmarket's) and format legality. To refresh prices and legality, the app sends Scryfall the IDs of the cards and printings in your collection; it does not send quantities, folders or anything else about you. When you scan or open a card, or open a deck, it may fetch the current price or format legality of those cards. New card data is downloaded when you choose to.</li>
+    <li><strong>tcgcsv.com</strong>: only if you choose TCGplayer Low or Mid prices in Settings. The app downloads TCGplayer's public price lists for the sets your cards come from. The only thing this reveals is which sets' lists it asks for.</li>
+    <li><strong>Commander Spellbook</strong> (commanderspellbook.com): combos.
+      <ul>
+        <li>When you open a deck's combos, the deck's card names and counts are sent.</li>
+        <li>When you open "Combos you could build", or use the deck builder or Suggest, the names and counts of the cards in your collection are sent.</li>
+        <li>A card's detail sheet sends that one card's name.</li>
+        <li>Nothing is sent to Commander Spellbook until you open one of these.</li>
+      </ul>
+    </li>
+    <li><strong>Archidekt</strong> (archidekt.com): Deck Search. The app sends the search you make (format, commander, card name, colours, bracket, deck name) and fetches the decks you open. It does not send your collection: how much of a deck you own is worked out on your phone.</li>
+    <li><strong>MTGGoldfish</strong> (mtggoldfish.com): the headlines on the Home tab.</li>
+    <li><strong>Google ML Kit</strong>, which reads the text on cards on your phone. The camera image and the text it reads are not sent anywhere. Like every app that uses ML Kit, it sends Google device information (such as the manufacturer, model and OS version), the app's name and version, a per-installation identifier, and performance and configuration details (such as how long recognition took), which Google uses for diagnostics and usage analytics. See Google's <a href="https://developers.google.com/ml-kit/android-data-disclosure">ML Kit data disclosure</a>.</li>
+    <li><strong>Links you tap</strong> (to Scryfall, TCGplayer, Cardmarket, MTGGoldfish, Archidekt or Commander Spellbook) open in your browser. "Buy missing" puts the list of cards you are missing into the TCGplayer link it opens.</li>
+    <li><strong>Google Play</strong>: to process the optional one-time Pro purchase and to check whether it has been made. Google handles the payment under its own privacy policy; the app never sees your payment details.</li>
   </ul>
   <p>Each of those services has its own privacy policy.</p>
 
   <h2>What the app does not do</h2>
   <ul>
-    <li>No analytics, tracking or advertising SDKs.</li>
+    <li>No advertising, analytics or tracking SDKs of its own.</li>
     <li>No account, sign-in, email or contacts access.</li>
-    <li>No sharing or selling of data. There is no data to share: the app cannot see your collection.</li>
+    <li>No selling of data, and no sharing of data for advertising.</li>
   </ul>
 
   <h2>Children</h2>
