@@ -1,0 +1,95 @@
+{
+ "v": 1,
+ "packs": [
+  {
+   "lang": "de",
+   "file": "de.json",
+   "bytes": 11596361,
+   "gzipBytes": 3351366,
+   "cards": 30210,
+   "names": 31610,
+   "text": 30844,
+   "built": "2026-09-28"
+  },
+  {
+   "lang": "fr",
+   "file": "fr.json",
+   "bytes": 11141339,
+   "gzipBytes": 3119023,
+   "cards": 30146,
+   "names": 31568,
+   "text": 28099,
+   "built": "2026-09-28"
+  },
+  {
+   "lang": "es",
+   "file": "es.json",
+   "bytes": 10193551,
+   "gzipBytes": 2933964,
+   "cards": 29629,
+   "names": 31039,
+   "text": 26782,
+   "built": "2026-09-28"
+  },
+  {
+   "lang": "it",
+   "file": "it.json",
+   "bytes": 10228136,
+   "gzipBytes": 2955864,
+   "cards": 29658,
+   "names": 31009,
+   "text": 26837,
+   "built": "2026-09-28"
+  },
+  {
+   "lang": "pt",
+   "file": "pt.json",
+   "bytes": 8313870,
+   "gzipBytes": 2469891,
+   "cards": 24838,
+   "names": 26098,
+   "text": 21952,
+   "built": "2026-09-28"
+  },
+  {
+   "lang": "zhs",
+   "file": "zhs.json",
+   "bytes": 1941543,
+   "gzipBytes": 812474,
+   "cards": 21580,
+   "names": 22704,
+   "text": 0,
+   "built": "2026-09-28"
+  },
+  {
+   "lang": "zht",
+   "file": "zht.json",
+   "bytes": 1137674,
+   "gzipBytes": 475363,
+   "cards": 12766,
+   "names": 13377,
+   "text": 0,
+   "built": "2026-09-28"
+  },
+  {
+   "lang": "ko",
+   "file": "ko.json",
+   "bytes": 1122715,
+   "gzipBytes": 417325,
+   "cards": 10868,
+   "names": 11479,
+   "text": 0,
+   "built": "2026-09-28"
+  },
+  {
+   "lang": "ru",
+   "file": "ru.json",
+   "bytes": 2119262,
+   "gzipBytes": 723677,
+   "cards": 15940,
+   "names": 16706,
+   "text": 0,
+   "built": "2026-09-28"
+  }
+ ]
+}

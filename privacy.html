@@ -27,15 +27,15 @@
 <body>
 <main>
   <h1>Stacksmith privacy policy</h1>
-  <p class="date">Last updated: 28 September 2026</p>
+  <p class="date">Last updated: 29 September 2026</p>
 
   <p>Stacksmith is a Magic: The Gathering card scanner and collection tracker. It has no accounts and no server of its own. This page explains what the app keeps on your phone, what it sends over the internet, and when.</p>
 
   <h2>What stays on your phone</h2>
   <ul>
-    <li><strong>Your collection, folders, decks, price history and settings</strong> are stored in a database on your phone. We have no server, so none of it is uploaded to us. Uninstalling the app deletes it. If Android backup is turned on for your phone, Android may include this database in your device backup with Google.</li>
+    <li><strong>Your collection, folders, tags, wishlist, decks, price history and settings</strong> are stored in a database on your phone. We have no server, so none of it is uploaded to us. Uninstalling the app deletes it. If Android backup is turned on for your phone, Android may include this database in your device backup with Google.</li>
     <li><strong>The camera</strong> is used only to recognise cards while the Scan screen is open. Frames are analysed on the phone, including the text on the card. No photos or video are stored or sent anywhere.</li>
-    <li><strong>CSV export</strong> creates a file only when you ask for one, and hands it to the app you choose to share it with.</li>
+    <li><strong>CSV export</strong> creates a file only when you ask for one, and hands it to the app you choose to share it with. Sharing your trade list or wishlist as text works the same way: the text goes only to the app you pick.</li>
   </ul>
 
   <h2>What the app sends over the internet, and when</h2>
@@ -43,6 +43,7 @@
   <ul>
     <li><strong>Scryfall</strong> (scryfall.com): card data, set lists, card images, prices (TCGplayer's and Cardmarket's) and format legality. To refresh prices and legality, the app sends Scryfall the IDs of the cards and printings in your collection; it does not send quantities, folders or anything else about you. When you scan or open a card, or open a deck, it may fetch the current price or format legality of those cards. New card data is downloaded when you choose to.</li>
     <li><strong>tcgcsv.com</strong>: only if you choose TCGplayer Low or Mid prices in Settings. The app downloads TCGplayer's public price lists for the sets your cards come from. The only thing this reveals is which sets' lists it asks for.</li>
+    <li><strong>European Central Bank</strong> (ecb.europa.eu): only if you choose to show prices in a currency other than your price source's (Settings &gt; Show prices in). The app downloads the ECB's public daily exchange rates; nothing about you or your collection is sent.</li>
     <li><strong>Commander Spellbook</strong> (commanderspellbook.com): combos.
       <ul>
         <li>When you open a deck's combos, the deck's card names and counts are sent.</li>
@@ -53,8 +54,9 @@
     </li>
     <li><strong>Archidekt</strong> (archidekt.com): Deck Search. The app sends the search you make (format, commander, card name, colours, bracket, deck name) and fetches the decks you open. It does not send your collection: how much of a deck you own is worked out on your phone.</li>
     <li><strong>MTGGoldfish</strong> (mtggoldfish.com): the headlines on the Home tab.</li>
+    <li><strong>GitHub Pages</strong> (colinwithat-boop.github.io): card-language packs, the names (and for some languages the rules text) of cards printed in German, French, Spanish, Italian, Portuguese, Chinese, Korean or Russian. A pack is downloaded when you add that card language in Settings, and once on its own for your phone's language (or the app's, when you set it to one of these), unless you removed it. The request reveals your IP address and which language pack is asked for; nothing else is sent.</li>
     <li><strong>Google ML Kit</strong>, which reads the text on cards on your phone. The camera image and the text it reads are not sent anywhere. Like every app that uses ML Kit, it sends Google device information (such as the manufacturer, model and OS version), the app's name and version, a per-installation identifier, and performance and configuration details (such as how long recognition took), which Google uses for diagnostics and usage analytics. See Google's <a href="https://developers.google.com/ml-kit/android-data-disclosure">ML Kit data disclosure</a>.</li>
-    <li><strong>Links you tap</strong> (to Scryfall, TCGplayer, Cardmarket, MTGGoldfish, Archidekt or Commander Spellbook) open in your browser. "Buy missing" puts the list of cards you are missing into the TCGplayer link it opens.</li>
+    <li><strong>Links you tap</strong> (to Scryfall, TCGplayer, Cardmarket, MTGGoldfish, Archidekt or Commander Spellbook) open in your browser. "Buy missing" puts the list of cards you are missing (from a deck, or from a set in your inventory) into the TCGplayer link it opens, and the wishlist's "Buy on TCGplayer" puts the cards on your wishlist (names and counts) into it.</li>
     <li><strong>Google Play</strong>: to process the optional one-time Pro purchase and to check whether it has been made. Google handles the payment under its own privacy policy; the app never sees your payment details.</li>
   </ul>
   <p>Each of those services has its own privacy policy.</p>
