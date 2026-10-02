@@ -54,15 +54,22 @@ function decode(s) {
   });
 }
 
-/** The product page's name, cleaned: the quotes Japanese pages wrap it in, the brand prefix of Universes Beyond pages. */
+/**
+ * The product page's name, cleaned: the quotes Japanese pages wrap it in
+ * (sometimes around the brand prefix too, sometimes with spaces inside),
+ * the "Magic: The Gathering |" brand prefix of Universes Beyond pages in
+ * either language, and the trademark sign. Each step is tried twice so
+ * the order they appear in does not matter.
+ */
 function cleanName(h1) {
-  return decode(h1)
-    .replace(/<[^>]+>/g, '')
-    .replace(/\s+/g, ' ')
-    .replace(/^『(.*)』$/, '$1')
-    .replace(/^(Magic: The Gathering|マジック：ザ・ギャザリング)\s*\|\s*/i, '')
-    .replace(/™/g, '')
-    .trim();
+  let s = decode(h1).replace(/<[^>]+>/g, '').replace(/™/g, '').replace(/\s+/g, ' ').trim();
+  for (let i = 0; i < 2; i++) {
+    s = s
+      .replace(/^『\s*(.*?)\s*』$/, '$1')
+      .replace(/^(Magic: The Gathering|マジック：ザ・ギャザリング)\s*[|｜]\s*/i, '')
+      .trim();
+  }
+  return s;
 }
 
 async function pageName(lang, slug) {
