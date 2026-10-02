@@ -37,7 +37,7 @@ jobs:
         run: |
           mkdir -p _site
           cp index.html privacy.html support.html _site/
-          cp -r packs sets _site/
+          cp -r packs sets delta _site/
       - name: Build the price file from Scryfall's bulk data
         run: node scripts/build-prices.mjs --out _site/prices/latest.json
       # The card facts (legality, colour identity, Game Changer) for the app's

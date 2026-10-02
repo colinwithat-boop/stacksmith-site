@@ -1,0 +1,30 @@
+{
+ "v": 1,
+ "db": "cards-v10.db",
+ "sets": {
+  "pf27": {
+   "count": 1,
+   "bundleCount": 0,
+   "scryfallCount": 1,
+   "cards": "pf27.json",
+   "sigs": "pf27.bin",
+   "records": 1
+  },
+  "unk": {
+   "count": 15,
+   "bundleCount": 512,
+   "scryfallCount": 527,
+   "cards": "unk.json",
+   "sigs": "unk.bin",
+   "records": 0
+  },
+  "sld": {
+   "count": 63,
+   "bundleCount": 2757,
+   "scryfallCount": 2820,
+   "cards": "sld.json",
+   "sigs": "sld.bin",
+   "records": 64
+  }
+ }
+}
