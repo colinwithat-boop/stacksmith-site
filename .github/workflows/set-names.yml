@@ -1,0 +1,45 @@
+# Refreshes sets/names.json (the Stacksmith app's localized set names)
+# from Wizards' product pages once a week, and whenever this workflow or
+# the script changes. A changed file is committed to main, which GitHub
+# Pages redeploys; the app fetches it on its next launch. Run it by hand
+# from the Actions tab (Run workflow).
+name: Update set names
+
+on:
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/set-names.yml
+      - scripts/update-set-names.mjs
+
+permissions:
+  contents: write
+
+concurrency:
+  group: set-names
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Read Wizards' product pages
+        run: node scripts/update-set-names.mjs
+      - name: Commit the names if they changed
+        run: |
+          if git diff --quiet -- sets/names.json; then
+            echo "No change."
+            exit 0
+          fi
+          git config user.name "Stacksmith"
+          git config user.email "stackscanapp@gmail.com"
+          git add sets/names.json
+          git commit -m "Set names: refresh from Wizards' product pages ($(date -u +%Y-%m-%d))"
+          git push
