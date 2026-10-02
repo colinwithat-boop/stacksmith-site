@@ -1,0 +1,49 @@
+{
+  "updated": "2026-10-02",
+  "sets": {
+    "ecl": {
+      "en": "Lorwyn Eclipsed",
+      "ja": "ローウィンの昏明",
+      "de": "Lorwyns Finsternis",
+      "fr": "Lorwyn éclipsé",
+      "es": "Lorwyn eclipsado",
+      "it": "Eclissi di Lorwyn"
+    },
+    "fra": {
+      "en": "Reality Fracture",
+      "ja": "リアリティ・フラクチャー",
+      "de": "Zersplitterte Realität",
+      "fr": "Réalité fracturée",
+      "es": "Realidad fracturada"
+    },
+    "hob": {
+      "en": "The Hobbit",
+      "ja": "ホビット",
+      "de": "Der Hobbit",
+      "fr": "Le Hobbit",
+      "es": "El Hobbit",
+      "it": "Lo Hobbit"
+    },
+    "sos": {
+      "en": "Secrets of Strixhaven",
+      "ja": "ストリクスヘイヴンの秘密",
+      "de": "Geheimnisse von Strixhaven",
+      "fr": "Les secrets de Strixhaven",
+      "es": "Secretos de Strixhaven",
+      "it": "I Segreti di Strixhaven"
+    },
+    "tla": {
+      "en": "Avatar: The Last Airbender",
+      "ja": "アバター 伝説の少年アン",
+      "de": "Avatar – Der Herr der Elemente",
+      "fr": "Avatar, le dernier maître de l'air",
+      "es": "Avatar: La leyenda de Aang",
+      "it": "Avatar: La leggenda di Aang"
+    },
+    "tmt": {
+      "en": "Teenage Mutant Ninja Turtles",
+      "ja": "ミュータント タートルズ",
+      "fr": "Les Tortues Ninja"
+    }
+  }
+}
