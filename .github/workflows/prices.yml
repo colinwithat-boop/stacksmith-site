@@ -45,6 +45,15 @@ jobs:
       - name: Build the card facts file from Scryfall's bulk data
         continue-on-error: true
         run: node scripts/build-facts.mjs --out _site/facts/latest.json
+      # A failed facts build keeps the file the site already serves (the live
+      # site is still the previous deploy here), rather than dropping it.
+      - name: Keep the last facts file if the build failed
+        run: |
+          if [ ! -f _site/facts/latest.json ]; then
+            mkdir -p _site/facts
+            curl -fsSL https://colinwithat-boop.github.io/stacksmith-site/facts/latest.json -o _site/facts/latest.json || rm -f _site/facts/latest.json
+            echo "::warning::The facts build failed; the live file was republished."
+          fi
       - uses: actions/configure-pages@v5
         with:
           enablement: true
