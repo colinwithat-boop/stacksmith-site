@@ -1,7 +1,8 @@
 # Publishes the site to GitHub Pages with the day's price file in it:
 # prices/latest.json, built from Scryfall's default_cards bulk data (which
 # Scryfall refreshes around 09:00 UTC), for the Stacksmith app's daily
-# price update. Runs every morning, on any push to main (so the privacy
+# price update, and facts/latest.json (scripts/build-facts.mjs: legality,
+# colour identity, Game Changer per card) for its weekly facts check. Runs every morning, on any push to main (so the privacy
 # page, the packs and sets/names.json go live too; the set-names workflow
 # dispatches it after its own commit), and by hand from the Actions tab.
 # The site is deployed from this workflow's artifact, not from the branch,
@@ -39,6 +40,11 @@ jobs:
           cp -r packs sets _site/
       - name: Build the price file from Scryfall's bulk data
         run: node scripts/build-prices.mjs --out _site/prices/latest.json
+      # The card facts (legality, colour identity, Game Changer) for the app's
+      # weekly check. Optional: a failure here must not hold back the prices.
+      - name: Build the card facts file from Scryfall's bulk data
+        continue-on-error: true
+        run: node scripts/build-facts.mjs --out _site/facts/latest.json
       - uses: actions/configure-pages@v5
         with:
           enablement: true
