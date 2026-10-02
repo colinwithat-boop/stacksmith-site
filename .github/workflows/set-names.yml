@@ -17,6 +17,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: set-names
@@ -43,3 +44,8 @@ jobs:
           git add sets/names.json
           git commit -m "Set names: refresh from Wizards' product pages ($(date -u +%Y-%m-%d))"
           git push
+          # A push made with the workflow's own token starts no workflow, so
+          # the site is published by hand here (prices.yml deploys Pages).
+          gh workflow run prices.yml --ref main
+        env:
+          GH_TOKEN: ${{ github.token }}
