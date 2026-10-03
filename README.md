@@ -1,7 +1,11 @@
 # stacksmith-site
 
-The public files the Stacksmith app reads, served by GitHub Pages at
-https://colinwithat-boop.github.io/stacksmith-site/ (Pages source: GitHub
+The public files the Stacksmith app reads, served by Cloudflare Pages at
+https://stacksmith-app.pages.dev/ (the app's address since 2026-10-03,
+project stacksmith-app, deployed with the CLOUDFLARE_API_TOKEN and
+CLOUDFLARE_ACCOUNT_ID secrets) and by GitHub Pages at
+https://colinwithat-boop.github.io/stacksmith-site/ (for older app builds
+and the store listings' privacy link; Pages source: GitHub
 Actions, deployed by `.github/workflows/prices.yml` on every push and every
 morning).
 

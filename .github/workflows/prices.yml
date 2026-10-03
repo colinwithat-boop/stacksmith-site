@@ -1,4 +1,7 @@
-# Publishes the site to GitHub Pages with the day's data files in it:
+# Publishes the site, with the day's data files in it, to Cloudflare Pages
+# (https://stacksmith-app.pages.dev/, where the app reads it since
+# 2026-10-03) and to GitHub Pages (the same files, for app builds from
+# before and the store listings' privacy link):
 #  - prices/: the Stacksmith app's daily prices (scripts/build-prices.mjs,
 #    layout in scripts/price-changes.mjs): version.json, the version's full
 #    file, the change file from the version before (what a phone holding
@@ -44,10 +47,11 @@ concurrency:
   group: pages
   cancel-in-progress: false
 
-# The site's address, in one place (the app's lib/site.ts holds the same):
-# moving the site means changing both.
+# The address the app reads the site from, in one place (the app's
+# lib/site.ts holds the same, and its price-watch.yml): moving the site
+# means changing all three. The price build reads the live version there.
 env:
-  SITE_URL: https://colinwithat-boop.github.io/stacksmith-site/
+  SITE_URL: https://stacksmith-app.pages.dev/
   PRICE_SLOT_UTC: '10:20'
 
 jobs:
@@ -61,7 +65,7 @@ jobs:
       - name: Copy the site
         run: |
           mkdir -p _site
-          cp index.html privacy.html support.html _site/
+          cp index.html privacy.html support.html 404.html _site/
           cp -r packs sets delta _site/
       - name: Check the price file layout
         run: node scripts/price-changes-check.mjs
@@ -86,13 +90,13 @@ jobs:
             curl -fsSL "${SITE_URL}facts/latest.json" -o _site/facts/latest.json || rm -f _site/facts/latest.json
             echo "::warning::The facts build failed; the live file was republished."
           fi
-      # The same files on Cloudflare Pages (https://stacksmith-app.pages.dev/):
-      # static requests there are free and unmetered, so the app moves to it
-      # before a public launch (its lib/site.ts). Needs two repository
-      # secrets, CLOUDFLARE_API_TOKEN (a custom token with Account >
-      # Cloudflare Pages > Edit) and CLOUDFLARE_ACCOUNT_ID; skipped until
-      # both exist. The first run creates the project. Until the app reads
-      # from it, a failure here never holds back the GitHub Pages deploy.
+      # The files on Cloudflare Pages (https://stacksmith-app.pages.dev/),
+      # where the app reads them (static requests free and unmetered).
+      # Needs two repository secrets: CLOUDFLARE_API_TOKEN (an account API
+      # token, "stacksmith-site GitHub deploy", with Cloudflare Pages: Edit
+      # only, no expiry) and CLOUDFLARE_ACCOUNT_ID; skipped without them.
+      # A failure here still lets GitHub Pages deploy; the app repo's daily
+      # price-watch.yml emails the owner when the Cloudflare copy goes stale.
       - name: Is Cloudflare set up?
         id: cloudflare
         env:

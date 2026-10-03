@@ -27,7 +27,7 @@ const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const args = process.argv.slice(2);
 const i = args.indexOf('--out');
 const OUT = path.resolve(ROOT, i >= 0 ? args[i + 1] : '_site/facts/latest.json');
-const UA = 'Stacksmith facts (https://colinwithat-boop.github.io/stacksmith-site/)';
+const UA = 'Stacksmith facts (https://stacksmith-app.pages.dev/)';
 
 // The app's LEGALITY_FORMATS (lib/cardData/legality.ts), in its order.
 const FORMATS = [

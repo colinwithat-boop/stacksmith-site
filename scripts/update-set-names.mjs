@@ -31,7 +31,7 @@ const ONLY = opt('--codes', '')
   .split(',')
   .map((c) => c.trim().toLowerCase())
   .filter(Boolean);
-const UA = 'Stacksmith set-names (https://colinwithat-boop.github.io/stacksmith-site/)';
+const UA = 'Stacksmith set-names (https://stacksmith-app.pages.dev/)';
 const RELEASE_TYPES = new Set(['core', 'expansion', 'masters', 'commander', 'draft_innovation', 'starter']);
 // Wizards' site path per app language.
 const SITE_LANGS = { ja: 'ja', de: 'de', fr: 'fr', es: 'es', it: 'it', pt: 'pt-br' };

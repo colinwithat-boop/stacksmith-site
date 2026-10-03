@@ -44,7 +44,7 @@ const arg = (name, fallback) => {
   const i = args.indexOf(name);
   return i >= 0 ? args[i + 1] : fallback;
 };
-const SITE_URL = process.env.SITE_URL || 'https://colinwithat-boop.github.io/stacksmith-site/';
+const SITE_URL = process.env.SITE_URL || 'https://stacksmith-app.pages.dev/';
 const DIR = path.resolve(ROOT, arg('--dir', '_site/prices'));
 const LIVE = args.includes('--no-live') ? null : arg('--live', `${SITE_URL.replace(/\/?$/, '/')}prices/`);
 const UA = `Stacksmith prices (${SITE_URL})`;
