@@ -15,8 +15,14 @@
 // are one named drop joins it (MTGJSON missed #2840 inside a Labyrinth
 // drop). Other unnamed cards show only as a RUN of two or more numbers in a
 // row (a drop MTGJSON has not named yet, like the five Oddlands lands),
-// each run as one drop with no name ("Secret Lair" in the app), never under
-// an invented name; a lone or scattered one is a bonus card and left out.
+// each run as one drop with no name ("Secret Lair drop" in the app), never
+// under an invented name; a lone or scattered one is a bonus card and left
+// out. Each day also carries `saleAt`, the moment the drops go on sale
+// (SALE_HOUR_LA, Los Angeles time, the store's): the app shows and sorts by
+// it in the phone's own time zone, where the US day alone read a day early
+// in Japan. Without MTGJSON's names every card would be unnamed and drops
+// that meet would run together, so build-home.mjs then keeps the live
+// file's drops instead (as it does when the Scryfall search fails).
 // Nothing is read from Wizards' sites (the owner's call, 2026-10-03): the
 // store is only linked to.
 
@@ -30,6 +36,18 @@ export const MAX_SETS = 10;
 /** Pictures per drop in the file (the app shows two or three). */
 export const PICTURES_PER_DROP = 3;
 export const STORE_URL = 'https://secretlair.wizards.com/';
+/** Secret Lair drops go on sale at 9 am Pacific. */
+export const SALE_HOUR_LA = 9;
+
+/** The moment a sale day's drops go on sale: SALE_HOUR_LA o'clock in Los Angeles on `day`, as an ISO instant (PDT or PST by the date). */
+export function saleAtOf(day) {
+  const hourIn = (t) => Number(new Intl.DateTimeFormat('en-US', { timeZone: 'America/Los_Angeles', hour: 'numeric', hourCycle: 'h23' }).format(t));
+  for (const offset of [7, 8]) {
+    const t = new Date(Date.parse(day + 'T00:00:00Z') + (SALE_HOUR_LA + offset) * 3_600_000);
+    if (hourIn(t) === SALE_HOUR_LA) return t.toISOString();
+  }
+  return new Date(Date.parse(day + 'T00:00:00Z') + (SALE_HOUR_LA + 7) * 3_600_000).toISOString();
+}
 
 /** A UTC day (YYYY-MM-DD) `days` before `today`. */
 export function dayBefore(today, days) {
@@ -121,6 +139,7 @@ export function groupDrops(cards, dropOf, today) {
     })
     .map(({ date, drops }) => ({
       date,
+      saleAt: saleAtOf(date),
       drops: drops
         .sort((a, b) => {
           const ua = !Number.isNaN(Number(a[0])) || a[0] === '';
@@ -151,6 +170,14 @@ function collator(a, b) {
   const nb = Number(b);
   if (Number.isFinite(na) && Number.isFinite(nb)) return na - nb;
   return a < b ? -1 : a > b ? 1 : 0;
+}
+
+/** The live file's drops still within DROPS_BACK_DAYS of `today`, for a run whose own could not be built; [] when it has none. */
+export function carriedWaves(liveFile, today) {
+  const waves = liveFile?.secretLair?.waves;
+  if (!Array.isArray(waves)) return [];
+  const from = dayBefore(today, DROPS_BACK_DAYS);
+  return waves.filter((w) => typeof w?.date === 'string' && w.date >= from && Array.isArray(w.drops) && w.drops.length > 0);
 }
 
 /** The file's text. */

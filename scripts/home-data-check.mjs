@@ -4,7 +4,7 @@
 // the Scryfall links and the file's shape. The prices workflow runs it
 // before the Home build. Usage:
 //   node scripts/home-data-check.mjs
-import { FORMAT, MAX_SETS, PICTURES_PER_DROP, STORE_URL, dayBefore, groupDrops, homeBody, searchUrl, upcomingSets } from './home-data.mjs';
+import { FORMAT, MAX_SETS, PICTURES_PER_DROP, STORE_URL, carriedWaves, dayBefore, groupDrops, homeBody, saleAtOf, searchUrl, upcomingSets } from './home-data.mjs';
 
 let checks = 0;
 let failed = 0;
@@ -84,6 +84,17 @@ expect('drops: a card between two drops stays out', between[0].drops.map((d) => 
 const twice = groupDrops([card(1, '2026-10-12'), card(1, '2026-10-12'), card(2, '2026-10-12')], () => 'T', TODAY);
 expect('drops: a number counts once', [twice[0].drops[0].count, twice[0].drops[0].pictures.length], [2, 2]);
 expect('drops: no names at all, a run still shows', groupDrops([card(5, '2026-10-12'), card(6, '2026-10-12')], () => null, TODAY)[0].drops[0].name, null);
+
+// ------------------------------------------------- sale times, carried drops
+expect('sale: 9 am in Los Angeles, summer time', saleAtOf('2026-10-12'), '2026-10-12T16:00:00.000Z');
+expect('sale: 9 am in Los Angeles, winter time', saleAtOf('2026-12-01'), '2026-12-01T17:00:00.000Z');
+expect('sale: the day summer time starts', saleAtOf('2026-03-08'), '2026-03-08T16:00:00.000Z');
+expect('sale: the day it ends', saleAtOf('2026-11-01'), '2026-11-01T17:00:00.000Z');
+expect('sale: on each wave', waves.map((w) => w.saleAt), ['2026-10-26T16:00:00.000Z', '2026-10-12T16:00:00.000Z']);
+const live = { secretLair: { waves: [{ date: '2026-10-12', drops: [{ name: 'A' }] }, { date: '2026-08-01', drops: [{ name: 'Old' }] }, { date: '2026-10-19', drops: [] }] } };
+expect('carried: the live drops still in the window', carriedWaves(live, TODAY).map((w) => w.date), ['2026-10-12']);
+expect('carried: no live file', carriedWaves(null, TODAY), []);
+expect('carried: a page, not a file', carriedWaves('<!doctype html>', TODAY), []);
 
 // --------------------------------------------------------------- the file
 const body = JSON.parse(homeBody({ built: '2026-10-03T10:30:00.000Z', sets, names: { mkm: { ja: 'x' } }, waves }));

@@ -72,8 +72,6 @@ jobs:
           cp -r packs sets delta _site/
       - name: Check the price file layout
         run: node scripts/price-changes-check.mjs
-      - name: Check the Home file's grouping
-        run: node scripts/home-data-check.mjs
       # Only the morning run (or one started by hand with new_version) makes
       # a new price version; any other publishes the live one again
       # (scripts/build-prices.mjs).
@@ -98,10 +96,12 @@ jobs:
       # What the app's Home tab shows under "Coming up": the next sets with
       # their names in the app's languages, and the Secret Lair drops
       # (scripts/build-home.mjs). Optional, as the facts: the app falls back
-      # to Scryfall's set list when it cannot have the file.
+      # to Scryfall's set list when it cannot have the file. Its grouping
+      # check runs first, in the same step, so a failing check skips only
+      # this build and the live file is republished.
       - name: Build the Home file
         continue-on-error: true
-        run: node scripts/build-home.mjs --out _site/home/latest.json
+        run: node scripts/home-data-check.mjs && node scripts/build-home.mjs --out _site/home/latest.json
       - name: Keep the last Home file if the build failed
         run: |
           if [ ! -f _site/home/latest.json ]; then
