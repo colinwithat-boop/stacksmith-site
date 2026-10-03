@@ -1,5 +1,14 @@
 {
  "v": 1,
  "db": "cards-v11.db",
- "sets": {}
+ "sets": {
+  "sld": {
+   "count": 1,
+   "bundleCount": 2820,
+   "scryfallCount": 2821,
+   "cards": "sld.json",
+   "sigs": "sld.bin",
+   "records": 2
+  }
+ }
 }
