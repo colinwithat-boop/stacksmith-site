@@ -15,6 +15,14 @@ morning).
 - `packs/`: the card-language packs (names and rules text per language).
 - `sets/names.json`: localized set names for the app's Home tab, refreshed
   every Monday by `.github/workflows/set-names.yml` from Wizards' product pages.
+- `home/`: `latest.json`, what the app's Home tab shows under "Coming up":
+  the next set releases (with the names above) and the Secret Lair drops
+  from a few weeks back to the newest announced, by sale day and drop, each
+  with a Scryfall search link. Built on every deploy by
+  `scripts/build-home.mjs` from Scryfall (sets, the Secret Lair cards) and
+  MTGJSON's SLD.json (the drop names, MIT); never committed. Grouping and
+  shape: `scripts/home-data.mjs`, checked by `scripts/home-data-check.mjs`.
+  Nothing is read from Wizards' Secret Lair store; the app only links to it.
 - `prices/`: the day's prices for every paper printing, built from
   Scryfall's bulk data by `scripts/build-prices.mjs` in the daily deploy and
   never committed. `version.json` names the current version's full file and
