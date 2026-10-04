@@ -3,12 +3,12 @@
  "db": "cards-v11.db",
  "sets": {
   "sld": {
-   "count": 1,
+   "count": 2,
    "bundleCount": 2820,
-   "scryfallCount": 2821,
+   "scryfallCount": 2822,
    "cards": "sld.json",
    "sigs": "sld.bin",
-   "records": 2
+   "records": 3
   }
  }
 }
