@@ -2,13 +2,29 @@
  "v": 1,
  "db": "cards-v11.db",
  "sets": {
+  "pfra": {
+   "count": 90,
+   "bundleCount": 0,
+   "scryfallCount": 90,
+   "cards": "pfra.json",
+   "sigs": "pfra.bin",
+   "records": 90
+  },
+  "pbig": {
+   "count": 16,
+   "bundleCount": 14,
+   "scryfallCount": 30,
+   "cards": "pbig.json",
+   "sigs": "pbig.bin",
+   "records": 16
+  },
   "sld": {
-   "count": 2,
+   "count": 7,
    "bundleCount": 2820,
-   "scryfallCount": 2822,
+   "scryfallCount": 2827,
    "cards": "sld.json",
    "sigs": "sld.bin",
-   "records": 3
+   "records": 8
   }
  }
 }
