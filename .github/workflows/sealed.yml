@@ -1,0 +1,58 @@
+# Refreshes sealed/ (what is inside every sealed product the Stacksmith
+# app's Packs tab values: booster odds, box and bundle contents, deck
+# lists; scripts/build-sealed.mjs) from MTGJSON once a day, and whenever
+# this workflow or the scripts change. The files hold no prices and no
+# build time, so they change only when MTGJSON's data does (a new set's
+# booster odds, a new Secret Lair drop): a change is committed to main and
+# the site published. Run it by hand from the Actions tab (Run workflow).
+name: Update sealed products
+
+on:
+  schedule:
+    # After MTGJSON's nightly build, before the morning price run (10:20).
+    - cron: '41 7 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/sealed.yml
+      - scripts/build-sealed.mjs
+      - scripts/sealed-data.mjs
+      - scripts/sealed-data-check.mjs
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: sealed
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check the build's pure part
+        run: node scripts/sealed-data-check.mjs
+      - name: Read MTGJSON's sealed products and booster odds
+        run: node scripts/build-sealed.mjs --out sealed
+      - name: Commit the files if they changed
+        run: |
+          if [ -z "$(git status --porcelain -- sealed)" ]; then
+            echo "No change."
+            exit 0
+          fi
+          git config user.name "Stacksmith"
+          git config user.email "stackscanapp@gmail.com"
+          git add -A sealed
+          git commit -m "Sealed products: refresh from MTGJSON ($(date -u +%Y-%m-%d))"
+          git push
+          # A push made with the workflow's own token starts no workflow, so
+          # the site is published by hand here (prices.yml deploys it).
+          gh workflow run prices.yml --ref main
+        env:
+          GH_TOKEN: ${{ github.token }}

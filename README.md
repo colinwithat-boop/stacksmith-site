@@ -23,6 +23,32 @@ morning).
   MTGJSON's SLD.json (the drop names, MIT); never committed. Grouping and
   shape: `scripts/home-data.mjs`, checked by `scripts/home-data-check.mjs`.
   Nothing is read from Wizards' Secret Lair store; the app only links to it.
+- `sealed/`: what is inside sealed products, for the app's Packs tab:
+  `index.json` (every set with a product the app can value, newest first)
+  and `sets/set-<CODE>.json` (a set's products as a tree of parts: cards, packs
+  of a booster type, deck lists and other products; every booster type's
+  slot layouts with each sheet's cards and weights; the deck lists), all by
+  Scryfall id. Built from MTGJSON (MIT: SetList.json, the booster tables,
+  the card and token identifiers) by `scripts/build-sealed.mjs`, the pure
+  part and format in `scripts/sealed-data.mjs`, checked by
+  `scripts/sealed-data-check.mjs`. No prices and no build time, so the
+  files change only when MTGJSON's data does: `.github/workflows/sealed.yml`
+  rebuilds them daily (07:41 UTC) and commits them only when they changed,
+  then publishes the site. A product is listed only when every part of it
+  can be valued (its booster types' odds are in MTGJSON, its cards resolve
+  to Scryfall ids); online redemptions and Arena's boosters never are.
+  `prices.json` beside them (never committed) is the sealed products' own
+  prices for the sets of the last three years, in each market the app
+  prices in: `usd`, TCGplayer's Market by TCGplayer product id, from
+  tcgcsv's group files, and `eur`, Cardmarket's trend by Cardmarket
+  product id (the figure Scryfall's card prices in euros are), from
+  Cardmarket's public daily price guide. Built in every deploy by
+  `scripts/build-sealed-prices.mjs`, which keeps the live file's prices
+  for a market that has not published since (tcgcsv's last-updated.txt,
+  the guide's ETag). Products in another language (War of the Spark's
+  Japanese boosters, Renaissance's German ones) are left out: their cards
+  are the set's own in that language, and the app has only English
+  prices; a Secret Lair drop in Japanese stays (its own printings).
 - `prices/`: the day's prices for every paper printing, built from
   Scryfall's bulk data by `scripts/build-prices.mjs` in the daily deploy and
   never committed. `version.json` names the current version's full file and

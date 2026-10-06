@@ -15,6 +15,9 @@
 #  - home/latest.json (scripts/build-home.mjs): the Home tab's upcoming sets
 #    with their localized names, and the Secret Lair drops, from Scryfall
 #    and MTGJSON; rebuilt on every run.
+#  - sealed/: what is inside sealed products (committed, refreshed from
+#    MTGJSON by sealed.yml) and sealed/prices.json, their TCGplayer Market
+#    prices from tcgcsv (scripts/build-sealed-prices.mjs), for the Packs tab.
 # Runs every morning, on any push to main (so the privacy page, the packs
 # and sets/names.json go live too; the set-names workflow dispatches it
 # after its own commit), and by hand from the Actions tab. The site is
@@ -69,7 +72,7 @@ jobs:
         run: |
           mkdir -p _site
           cp index.html privacy.html support.html 404.html _site/
-          cp -r packs sets delta _site/
+          cp -r packs sets delta sealed _site/
       - name: Check the price file layout
         run: node scripts/price-changes-check.mjs
       # Only the morning run (or one started by hand with new_version) makes
@@ -108,6 +111,20 @@ jobs:
             mkdir -p _site/home
             curl -fsSL "${SITE_URL}home/latest.json" -o _site/home/latest.json || rm -f _site/home/latest.json
             echo "::warning::The Home build failed; the live file was republished."
+          fi
+      # What sealed products sell for on TCGplayer, beside the value of the
+      # cards inside (the Packs tab). Optional, as the facts: the app shows
+      # no online price without it. tcgcsv is asked only when it has
+      # published since the live file (scripts/build-sealed-prices.mjs).
+      - name: Build the sealed prices file
+        continue-on-error: true
+        run: node scripts/build-sealed-prices.mjs --out _site/sealed/prices.json
+      - name: Keep the last sealed prices file if the build failed
+        run: |
+          if [ ! -f _site/sealed/prices.json ]; then
+            mkdir -p _site/sealed
+            curl -fsSL "${SITE_URL}sealed/prices.json" -o _site/sealed/prices.json || rm -f _site/sealed/prices.json
+            echo "::warning::The sealed prices build failed; the live file was republished."
           fi
       # The files on Cloudflare Pages (https://stacksmith-app.pages.dev/),
       # where the app reads them (static requests free and unmetered).
