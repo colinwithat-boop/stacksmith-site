@@ -10,6 +10,14 @@
    "sigs": "pfra.bin",
    "records": 90
   },
+  "pf26": {
+   "count": 4,
+   "bundleCount": 13,
+   "scryfallCount": 17,
+   "cards": "pf26.json",
+   "sigs": "pf26.bin",
+   "records": 4
+  },
   "pbig": {
    "count": 16,
    "bundleCount": 14,
@@ -19,12 +27,12 @@
    "records": 16
   },
   "sld": {
-   "count": 7,
+   "count": 11,
    "bundleCount": 2820,
-   "scryfallCount": 2827,
+   "scryfallCount": 2831,
    "cards": "sld.json",
    "sigs": "sld.bin",
-   "records": 8
+   "records": 12
   }
  }
 }
