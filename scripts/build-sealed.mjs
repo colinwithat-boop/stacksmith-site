@@ -13,7 +13,7 @@
 // with the site. By hand:
 //
 //   node scripts/build-sealed.mjs [--out sealed]
-import { createGunzip } from 'node:zlib';
+import { createGunzip, gzipSync } from 'node:zlib';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -223,7 +223,20 @@ for (const set of setList) {
   // Lair's set is dated 2019 and would sort below every set since, while
   // its drops come out every week.
   const newest = listed.reduce((d, p) => ((p.date ?? '') > d ? p.date : d), set.releaseDate ?? '');
-  index.push({ code, name: set.name, date: newest || null, type: set.type ?? null, n: listed.length });
+  // `p`: every listed product as [short name, category, subtype, date], in
+  // the set file's order (its position names it there: an id per product
+  // doubled the index), for the app's search over every set without its
+  // file; `gz`: the file's gzipped size, for the size an "older products"
+  // download shows.
+  index.push({
+    code,
+    name: set.name,
+    date: newest || null,
+    type: set.type ?? null,
+    n: listed.length,
+    gz: gzipSync(body).length,
+    p: listed.map((p) => [p.short, p.cat, p.sub, p.date]),
+  });
 }
 // A set that no longer has a product to value loses its file.
 for (const name of fs.readdirSync(path.join(OUT, 'sets'))) if (!written.has(name)) fs.rmSync(path.join(OUT, 'sets', name));

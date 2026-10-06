@@ -15,17 +15,23 @@
 //    day behind it), so a box and its cards are priced the same way. A
 //    sealed product's Cardmarket price covers every language of it.
 // The product ids come from MTGJSON (each product's tcgplayerProductId and
-// mcmId, in the committed sealed/sets/set-*.json); only the products of sets
-// (or Secret Lair drops) from the last WINDOW_YEARS are kept. `since`, the
-// window's first day, is in the file: the app's Packs tab ranks the same
-// products, so a product it calls current always has its price here.
+// mcmId, in the committed sealed/sets/set-*.json). Every year's products are
+// priced (the owner, 2026-10-06: the app can load every set). `since`, the
+// first day of the last CURRENT_YEARS, is in the file: the app's Packs tab
+// calls those products current and ranks them.
 //
 // Asked as little as can be: tcgcsv one request started every 250 ms as
 // its FAQ asks, with an identifying User-Agent, and not at all when it has
-// not published since the live file was built (its last-updated.txt);
-// Cardmarket's 26 MB guide only when its ETag moved (a HEAD request first).
-// Otherwise the live file's prices are republished. A tcgcsv group that
-// fails keeps the live file's prices for its products.
+// not published since the live file was built (its last-updated.txt). Of
+// its groups, the current sets' are asked every day it publishes; an older
+// set's sealed prices move slowly, so its group is asked one day in
+// ROTATION_DAYS (by group id), or sooner when the file has no refresh of it
+// within ROTATION_DAYS + 1 days (a first run asks every group once). That is
+// ~50 requests a day and ~40 more, against ~330 every day. `refreshed` in
+// the file says when each group was last asked. Cardmarket's 26 MB guide,
+// which holds every product, only when its ETag moved (a HEAD request
+// first). Otherwise the live file's prices are republished. A tcgcsv group
+// that fails keeps the live file's prices for its products.
 //
 //   node scripts/build-sealed-prices.mjs [--out _site/sealed/prices.json]
 //
@@ -44,30 +50,38 @@ const SITE_URL = process.env.SITE_URL || 'https://stacksmith-app.pages.dev/';
 const UA = 'Stacksmith sealed prices (https://stacksmith-app.pages.dev/; stackscanapp@gmail.com)';
 const TCGCSV = 'https://tcgcsv.com/tcgplayer/1/';
 const CARDMARKET_GUIDE = 'https://downloads.s3.cardmarket.com/productCatalog/priceGuide/price_guide_1.json';
-const WINDOW_YEARS = 3;
+const CURRENT_YEARS = 3;
+const ROTATION_DAYS = 7;
 const SPACING_MS = 250;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
-const since = new Date();
-since.setUTCFullYear(since.getUTCFullYear() - WINDOW_YEARS);
+const now = Date.now();
+const since = new Date(now);
+since.setUTCFullYear(since.getUTCFullYear() - CURRENT_YEARS);
 const SINCE = since.toISOString().slice(0, 10);
+const TODAY = new Date(now).toISOString().slice(0, 10);
 
-// Which TCGplayer groups and products, and which Cardmarket products, are wanted.
+// Which TCGplayer groups and products, and which Cardmarket products, are
+// wanted: every product of every set. A group is current when one of its
+// products is from the last CURRENT_YEARS.
 const wantedTcg = new Map();
+const currentGroups = new Set();
 const wantedMcm = new Set();
 for (const name of fs.readdirSync(SETS_DIR).sort()) {
   const set = JSON.parse(fs.readFileSync(path.join(SETS_DIR, name), 'utf8'));
-  const recent = set.products.filter((p) => (p.date ?? set.date ?? '') >= SINCE);
-  for (const p of recent) if (p.mcm) wantedMcm.add(p.mcm);
+  for (const p of set.products) if (p.mcm) wantedMcm.add(p.mcm);
   if (!set.group) continue;
   const group = String(set.group);
-  for (const p of recent) {
+  for (const p of set.products) {
     if (!p.tcg) continue;
     if (!wantedTcg.has(group)) wantedTcg.set(group, new Set());
     wantedTcg.get(group).add(p.tcg);
+    if ((p.date ?? set.date ?? '') >= SINCE) currentGroups.add(group);
   }
 }
 const groups = [...wantedTcg.keys()].sort((a, b) => Number(a) - Number(b));
-console.log(`${groups.length} TCGplayer groups, ${[...wantedTcg.values()].reduce((n, s) => n + s.size, 0)} TCGplayer and ${wantedMcm.size} Cardmarket products since ${SINCE}`);
+const wantedTcgIds = new Set([...wantedTcg.values()].flatMap((ids) => [...ids]));
+console.log(`${groups.length} TCGplayer groups (${currentGroups.size} current), ${wantedTcgIds.size} TCGplayer and ${wantedMcm.size} Cardmarket products; current since ${SINCE}`);
 
 async function get(url, { tries = 3, okMissing = false, method = 'GET' } = {}) {
   for (let attempt = 1; ; attempt++) {
@@ -99,20 +113,37 @@ const pick = (prices, ids) => Object.fromEntries(Object.entries(prices ?? {}).fi
 // ---- TCGplayer, through tcgcsv
 const tcgcsv = (await (await get('https://tcgcsv.com/last-updated.txt')).text()).trim();
 let usd;
+let refreshed;
 let tcgFailed = 0;
-if (live && live.tcgcsv === tcgcsv && Array.isArray(live.groups) && live.groups.join(',') === groups.join(',')) {
-  usd = live.usd;
+let asked = [];
+if (live && live.tcgcsv === tcgcsv && live.refreshed && typeof live.refreshed === 'object') {
+  usd = pick(live.usd, wantedTcgIds);
+  refreshed = pick(live.refreshed, new Set(groups));
   console.log(`tcgcsv has not published since ${tcgcsv}: its prices are kept.`);
 } else {
-  usd = {};
+  // Start from the live file's prices: a group not asked today keeps them.
+  usd = pick(live?.usd, wantedTcgIds);
+  refreshed = pick(live?.refreshed, new Set(groups));
+  const day = Math.floor(now / DAY_MS);
+  const due = (g) => {
+    const last = refreshed[g];
+    return !last || now - Date.parse(`${last}T00:00:00Z`) >= (ROTATION_DAYS + 1) * DAY_MS;
+  };
+  asked = groups.filter((g) => currentGroups.has(g) || Number(g) % ROTATION_DAYS === day % ROTATION_DAYS || due(g));
+  // For trying the script by hand without asking tcgcsv for every group: SEALED_MAX_GROUPS=5.
+  if (process.env.SEALED_MAX_GROUPS) asked = asked.slice(0, Number(process.env.SEALED_MAX_GROUPS));
+  console.log(`asking tcgcsv for ${asked.length} of ${groups.length} groups today`);
   let started = 0;
-  for (const group of groups) {
+  for (const group of asked) {
     const wait = started + SPACING_MS - Date.now();
     if (wait > 0) await new Promise((r) => setTimeout(r, wait));
     started = Date.now();
     const want = wantedTcg.get(group);
     try {
       const body = await (await get(`${TCGCSV}${group}/prices`)).json();
+      // The group's answer replaces its products' prices: one no longer
+      // priced there loses its old price.
+      for (const id of want) delete usd[id];
       for (const r of Array.isArray(body.results) ? body.results : []) {
         const id = String(r.productId);
         if (!want.has(id) || typeof r.marketPrice !== 'number' || !(r.marketPrice > 0)) continue;
@@ -120,20 +151,24 @@ if (live && live.tcgcsv === tcgcsv && Array.isArray(live.groups) && live.groups.
         if (usd[id] !== undefined && r.subTypeName !== 'Normal') continue;
         usd[id] = Math.round(r.marketPrice * 100) / 100;
       }
+      refreshed[group] = TODAY;
     } catch (e) {
       tcgFailed++;
       console.warn(`::warning::tcgcsv group ${group}: ${e instanceof Error ? e.message : e}`);
       Object.assign(usd, pick(live?.usd, want));
     }
   }
-  if (tcgFailed > groups.length / 2) throw new Error(`${tcgFailed} of ${groups.length} tcgcsv groups failed: not publishing`);
+  if (tcgFailed > asked.length / 2) throw new Error(`${tcgFailed} of ${asked.length} tcgcsv groups failed: not publishing`);
 }
 
 // ---- Cardmarket's price guide
 const guideTag = (await get(CARDMARKET_GUIDE, { method: 'HEAD' })).headers.get('etag') ?? '';
 let eur;
 let cardmarket;
-if (live && guideTag && live.cardmarketEtag === guideTag && live.eur) {
+// Kept only while the guide is the same AND the products wanted are the ones
+// the live file was built for (a file of the last three years alone, or a new
+// set's products, needs the guide read again).
+if (live && guideTag && live.cardmarketEtag === guideTag && live.eur && live.cardmarketWanted === wantedMcm.size) {
   eur = pick(live.eur, wantedMcm);
   cardmarket = live.cardmarket;
   console.log(`Cardmarket's price guide of ${cardmarket} is unchanged: its prices are kept.`);
@@ -151,7 +186,7 @@ if (live && guideTag && live.cardmarketEtag === guideTag && live.eur) {
 const sortById = (o) => Object.fromEntries(Object.entries(o).sort((a, b) => Number(a[0]) - Number(b[0])));
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
 const body =
-  `{"v":2,"since":${JSON.stringify(SINCE)},"tcgcsv":${JSON.stringify(tcgcsv)},"groups":${JSON.stringify(groups)},"cardmarket":${JSON.stringify(cardmarket)},` +
-  `"cardmarketEtag":${JSON.stringify(guideTag)},"usd":${JSON.stringify(sortById(usd))},"eur":${JSON.stringify(sortById(eur))}}\n`;
+  `{"v":2,"since":${JSON.stringify(SINCE)},"tcgcsv":${JSON.stringify(tcgcsv)},"refreshed":${JSON.stringify(sortById(refreshed))},"cardmarket":${JSON.stringify(cardmarket)},` +
+  `"cardmarketEtag":${JSON.stringify(guideTag)},"cardmarketWanted":${wantedMcm.size},"usd":${JSON.stringify(sortById(usd))},"eur":${JSON.stringify(sortById(eur))}}\n`;
 fs.writeFileSync(OUT, body);
 console.log(`${Object.keys(usd).length} TCGplayer prices (tcgcsv ${tcgcsv}), ${Object.keys(eur).length} Cardmarket prices (guide ${cardmarket}), ${Math.round(body.length / 1024)} KB`);
