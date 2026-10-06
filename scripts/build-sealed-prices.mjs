@@ -16,7 +16,9 @@
 //    sealed product's Cardmarket price covers every language of it.
 // The product ids come from MTGJSON (each product's tcgplayerProductId and
 // mcmId, in the committed sealed/sets/set-*.json); only the products of sets
-// (or Secret Lair drops) from the last WINDOW_YEARS are kept.
+// (or Secret Lair drops) from the last WINDOW_YEARS are kept. `since`, the
+// window's first day, is in the file: the app's Packs tab ranks the same
+// products, so a product it calls current always has its price here.
 //
 // Asked as little as can be: tcgcsv one request started every 250 ms as
 // its FAQ asks, with an identifying User-Agent, and not at all when it has
@@ -149,7 +151,7 @@ if (live && guideTag && live.cardmarketEtag === guideTag && live.eur) {
 const sortById = (o) => Object.fromEntries(Object.entries(o).sort((a, b) => Number(a[0]) - Number(b[0])));
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
 const body =
-  `{"v":2,"tcgcsv":${JSON.stringify(tcgcsv)},"groups":${JSON.stringify(groups)},"cardmarket":${JSON.stringify(cardmarket)},` +
+  `{"v":2,"since":${JSON.stringify(SINCE)},"tcgcsv":${JSON.stringify(tcgcsv)},"groups":${JSON.stringify(groups)},"cardmarket":${JSON.stringify(cardmarket)},` +
   `"cardmarketEtag":${JSON.stringify(guideTag)},"usd":${JSON.stringify(sortById(usd))},"eur":${JSON.stringify(sortById(eur))}}\n`;
 fs.writeFileSync(OUT, body);
 console.log(`${Object.keys(usd).length} TCGplayer prices (tcgcsv ${tcgcsv}), ${Object.keys(eur).length} Cardmarket prices (guide ${cardmarket}), ${Math.round(body.length / 1024)} KB`);
