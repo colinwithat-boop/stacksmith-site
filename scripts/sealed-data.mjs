@@ -33,6 +33,35 @@ export function contentHash(fileWithoutHash) {
   return createHash('sha256').update(JSON.stringify(fileWithoutHash)).digest('hex').slice(0, 12);
 }
 
+/**
+ * A set's booster packs that come only inside its other products, never in
+ * a booster box or case of their own (Ravnica: Clue Edition's packs, a
+ * Commander Masters deck's collector sample pack), by id: the app's
+ * kinds.ts packsSoldInside, the same rule, so its older products' lists
+ * (from the index alone) leave them out as its set pages do. Theme boosters
+ * are sold alone, though MTGJSON also lists a set of the five.
+ */
+export function packsSoldInside(products) {
+  const inBox = new Set();
+  const inOther = new Set();
+  const walk = (parts, boxed, depth) => {
+    if (depth > 8) return;
+    for (const part of parts) {
+      if (part[0] === 's') (boxed ? inBox : inOther).add(part[1]);
+      else if (part[0] === 'v') for (const [, inner] of part[1]) walk(inner, boxed, depth + 1);
+    }
+  };
+  for (const p of products) walk(p.parts, p.cat === 'booster_box' || p.cat === 'booster_case', 0);
+  return new Set(products.filter((p) => p.cat === 'booster_pack' && p.sub !== 'theme' && inOther.has(p.id) && !inBox.has(p.id)).map((p) => p.id));
+}
+
+/** A product as the index lists it: [short, category, subtype, date, TCGplayer id], then 1 when it is a pack sold only inside. */
+export function indexProduct(p, inside) {
+  const out = [p.short, p.cat, p.sub, p.date, p.tcg ?? null];
+  if (inside.has(p.id)) out.push(1);
+  return out;
+}
+
 /** Booster types that exist only online (Arena's versions of a set's packs). */
 export function isDigitalBooster(name) {
   return /(^|-)(arena|mtgo)($|-)/.test(name);

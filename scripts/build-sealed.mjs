@@ -23,6 +23,8 @@ import {
   SEALED_FORMAT,
   buildBoosters,
   contentHash,
+  indexProduct,
+  packsSoldInside,
   deckCards,
   deckKey,
   isListedProduct,
@@ -225,19 +227,22 @@ for (const set of setList) {
   // Lair's set is dated 2019 and would sort below every set since, while
   // its drops come out every week.
   const newest = listed.reduce((d, p) => ((p.date ?? '') > d ? p.date : d), set.releaseDate ?? '');
-  // `h`: the file's content hash (contentHash). `p`: every listed product as
-  // [short name, category, subtype, date, TCGplayer id], in the set file's
-  // order (its position names it there, checked by name and date: an id per
-  // product doubled the index), for the app's search over every set and its
-  // older products, with their pictures, without the set file.
+  // `h`: the file's content hash (contentHash). `released`: the set's own
+  // release date (`date` sorts it, by its newest product). `p`: every listed
+  // product (indexProduct), in the set file's order (its position names it
+  // there, checked by name and date: an id per product doubled the index),
+  // for the app's search over every set and its older products, with their
+  // pictures, without the set file.
+  const inside = packsSoldInside(listed);
   index.push({
     code,
     name: set.name,
     date: newest || null,
+    released: set.releaseDate ?? null,
     type: set.type ?? null,
     n: listed.length,
     h,
-    p: listed.map((p) => [p.short, p.cat, p.sub, p.date, p.tcg ?? null]),
+    p: listed.map((p) => indexProduct(p, inside)),
   });
 }
 // A set that no longer has a product to value loses its file.

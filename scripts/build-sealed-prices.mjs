@@ -165,7 +165,8 @@ if (process.env.SEALED_MAX_GROUPS) asked = asked.slice(0, Number(process.env.SEA
       Object.assign(usd, pick(live?.usd, want));
     }
   }
-  if (tcgFailed > asked.length / 2) throw new Error(`${tcgFailed} of ${asked.length} tcgcsv groups failed: not publishing`);
+  // A share of a handful (the keep branch's new groups) says nothing about tcgcsv: those keep their live prices.
+  if (asked.length >= 5 && tcgFailed > asked.length / 2) throw new Error(`${tcgFailed} of ${asked.length} tcgcsv groups failed: not publishing`);
 }
 
 // ---- Cardmarket's price guide
