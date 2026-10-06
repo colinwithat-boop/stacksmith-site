@@ -25,9 +25,10 @@ morning).
   Nothing is read from Wizards' Secret Lair store; the app only links to it.
 - `sealed/`: what is inside sealed products, for the app's Packs tab:
   `index.json` (every set with a product the app can value, newest first,
-  each with its products' short names, kinds and dates for the app's search
-  over every set, by their place in the set file, and the file's gzipped
-  size; ~40 KB gzipped) and `sets/set-<CODE>.json` (a set's products as a tree of parts: cards, packs
+  each with its products' short names, kinds, dates and TCGplayer ids, for
+  the app's search over every set and its older products, by their place in
+  the set file, and the file's content hash `h`, which the set file carries
+  too, so the app can tell a copy from another build; ~55 KB gzipped) and `sets/set-<CODE>.json` (a set's products as a tree of parts: cards, packs
   of a booster type, deck lists and other products; every booster type's
   slot layouts with each sheet's cards and weights; the deck lists), all by
   Scryfall id. Built from MTGJSON (MIT: SetList.json, the booster tables,

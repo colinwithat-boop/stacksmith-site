@@ -112,27 +112,28 @@ const pick = (prices, ids) => Object.fromEntries(Object.entries(prices ?? {}).fi
 
 // ---- TCGplayer, through tcgcsv
 const tcgcsv = (await (await get('https://tcgcsv.com/last-updated.txt')).text()).trim();
-let usd;
-let refreshed;
+// Start from the live file's prices: a group not asked today keeps them.
+const usd = pick(live?.usd, wantedTcgIds);
+const refreshed = pick(live?.refreshed, new Set(groups));
 let tcgFailed = 0;
 let asked = [];
 if (live && live.tcgcsv === tcgcsv && live.refreshed && typeof live.refreshed === 'object') {
-  usd = pick(live.usd, wantedTcgIds);
-  refreshed = pick(live.refreshed, new Set(groups));
-  console.log(`tcgcsv has not published since ${tcgcsv}: its prices are kept.`);
+  // tcgcsv has not published since: its prices are kept, but a group the
+  // live file never asked (a set added since) is asked now (review, 2026-10-06).
+  asked = groups.filter((g) => !refreshed[g]);
+  console.log(`tcgcsv has not published since ${tcgcsv}: its prices are kept${asked.length ? `, ${asked.length} new groups asked` : ''}.`);
 } else {
-  // Start from the live file's prices: a group not asked today keeps them.
-  usd = pick(live?.usd, wantedTcgIds);
-  refreshed = pick(live?.refreshed, new Set(groups));
   const day = Math.floor(now / DAY_MS);
   const due = (g) => {
     const last = refreshed[g];
     return !last || now - Date.parse(`${last}T00:00:00Z`) >= (ROTATION_DAYS + 1) * DAY_MS;
   };
   asked = groups.filter((g) => currentGroups.has(g) || Number(g) % ROTATION_DAYS === day % ROTATION_DAYS || due(g));
-  // For trying the script by hand without asking tcgcsv for every group: SEALED_MAX_GROUPS=5.
-  if (process.env.SEALED_MAX_GROUPS) asked = asked.slice(0, Number(process.env.SEALED_MAX_GROUPS));
   console.log(`asking tcgcsv for ${asked.length} of ${groups.length} groups today`);
+}
+// For trying the script by hand without asking tcgcsv for every group: SEALED_MAX_GROUPS=5.
+if (process.env.SEALED_MAX_GROUPS) asked = asked.slice(0, Number(process.env.SEALED_MAX_GROUPS));
+{
   let started = 0;
   for (const group of asked) {
     const wait = started + SPACING_MS - Date.now();
@@ -141,10 +142,16 @@ if (live && live.tcgcsv === tcgcsv && live.refreshed && typeof live.refreshed ==
     const want = wantedTcg.get(group);
     try {
       const body = await (await get(`${TCGCSV}${group}/prices`)).json();
+      // Not a price list (a bad publish of one group): the live prices stay
+      // and the group stays due, never "refreshed" with nothing (review).
+      if (!body || body.success === false || !Array.isArray(body.results)) throw new Error('not a price list');
+      const named = body.results.filter((r) => want.has(String(r.productId))).length;
+      const livePriced = [...want].filter((id) => live?.usd?.[id] !== undefined).length;
+      if (named === 0 && livePriced >= 2) throw new Error(`names none of its ${want.size} products`);
       // The group's answer replaces its products' prices: one no longer
       // priced there loses its old price.
       for (const id of want) delete usd[id];
-      for (const r of Array.isArray(body.results) ? body.results : []) {
+      for (const r of body.results) {
         const id = String(r.productId);
         if (!want.has(id) || typeof r.marketPrice !== 'number' || !(r.marketPrice > 0)) continue;
         // A sealed product has one row, Normal; never let a Foil row win over it.

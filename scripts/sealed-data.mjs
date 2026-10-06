@@ -18,7 +18,20 @@
 //   ['v', [[weight, parts], ...]]      one of several contents, by weight
 // Items that are not cards (a deck box, a spindown, tokens) are left out.
 
+import { createHash } from 'node:crypto';
+
 export const SEALED_FORMAT = 1;
+
+/**
+ * A set file's content hash, `h` in the file and in its index entry: 12 hex
+ * characters of the SHA-256 of the file's JSON without it. The app names a
+ * product by its place in the set (the index's product list), and a copy of
+ * the file on the phone with another hash than the index's is another
+ * build, read again (review, 2026-10-06).
+ */
+export function contentHash(fileWithoutHash) {
+  return createHash('sha256').update(JSON.stringify(fileWithoutHash)).digest('hex').slice(0, 12);
+}
 
 /** Booster types that exist only online (Arena's versions of a set's packs). */
 export function isDigitalBooster(name) {

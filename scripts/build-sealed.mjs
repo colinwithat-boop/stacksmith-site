@@ -13,7 +13,7 @@
 // with the site. By hand:
 //
 //   node scripts/build-sealed.mjs [--out sealed]
-import { createGunzip, gzipSync } from 'node:zlib';
+import { createGunzip } from 'node:zlib';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -22,6 +22,7 @@ import { Readable } from 'node:stream';
 import {
   SEALED_FORMAT,
   buildBoosters,
+  contentHash,
   deckCards,
   deckKey,
   isListedProduct,
@@ -211,7 +212,8 @@ for (const set of setList) {
     boosters: sortedKeys(new Map([...need.boosters].map((k) => [k, boosters.get(k)]))),
     decks: sortedKeys(new Map([...need.decks].map((k) => [k, decks.get(k)]))),
   };
-  const body = JSON.stringify(file) + '\n';
+  const h = contentHash(file);
+  const body = JSON.stringify({ ...file, h }) + '\n';
   // set-CON.json, not CON.json: CON (Conflux), like PRN, AUX or NUL, is a
   // device name Windows will not make a file of, so a clone there lost it.
   const fileName = `set-${code}.json`;
@@ -223,19 +225,19 @@ for (const set of setList) {
   // Lair's set is dated 2019 and would sort below every set since, while
   // its drops come out every week.
   const newest = listed.reduce((d, p) => ((p.date ?? '') > d ? p.date : d), set.releaseDate ?? '');
-  // `p`: every listed product as [short name, category, subtype, date], in
-  // the set file's order (its position names it there: an id per product
-  // doubled the index), for the app's search over every set without its
-  // file; `gz`: the file's gzipped size, for the size an "older products"
-  // download shows.
+  // `h`: the file's content hash (contentHash). `p`: every listed product as
+  // [short name, category, subtype, date, TCGplayer id], in the set file's
+  // order (its position names it there, checked by name and date: an id per
+  // product doubled the index), for the app's search over every set and its
+  // older products, with their pictures, without the set file.
   index.push({
     code,
     name: set.name,
     date: newest || null,
     type: set.type ?? null,
     n: listed.length,
-    gz: gzipSync(body).length,
-    p: listed.map((p) => [p.short, p.cat, p.sub, p.date]),
+    h,
+    p: listed.map((p) => [p.short, p.cat, p.sub, p.date, p.tcg ?? null]),
   });
 }
 // A set that no longer has a product to value loses its file.

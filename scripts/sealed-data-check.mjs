@@ -9,6 +9,7 @@ import assert from 'node:assert/strict';
 
 import {
   buildBoosters,
+  contentHash,
   deckCards,
   finishCode,
   isDigitalBooster,
@@ -199,6 +200,14 @@ check('short names', () => {
   assert.equal(shortName('Commander Collection Green', 'Commander Collection: Green'), 'Commander Collection Green');
   assert.equal(shortName('The Big Box', 'The Hobbit'), 'The Big Box');
   assert.equal(shortName('Anthologies', 'Anthologies'), 'Anthologies');
+});
+
+check("a set file's content hash: 12 hex characters, the same for the same file, another for another", () => {
+  const file = { v: 1, code: 'XYZ', products: [{ id: 'a', short: 'Play Booster Pack' }] };
+  const h = contentHash(file);
+  assert.match(h, /^[0-9a-f]{12}$/);
+  assert.equal(contentHash(JSON.parse(JSON.stringify(file))), h, 'read back, the same');
+  assert.notEqual(contentHash({ ...file, products: [{ id: 'b', short: 'Play Booster Pack' }] }), h, 'another product, another hash');
 });
 
 console.log(`${passed} checks passed`);
