@@ -26,13 +26,21 @@
    "sigs": "pbig.bin",
    "records": 16
   },
+  "slp": {
+   "count": 3,
+   "bundleCount": 54,
+   "scryfallCount": 57,
+   "cards": "slp.json",
+   "sigs": "slp.bin",
+   "records": 3
+  },
   "sld": {
-   "count": 11,
+   "count": 12,
    "bundleCount": 2820,
-   "scryfallCount": 2831,
+   "scryfallCount": 2832,
    "cards": "sld.json",
    "sigs": "sld.bin",
-   "records": 12
+   "records": 13
   }
  }
 }
