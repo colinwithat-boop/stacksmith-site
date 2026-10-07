@@ -9,6 +9,9 @@ import assert from 'node:assert/strict';
 
 import {
   buildBoosters,
+  contentHash,
+  indexProduct,
+  packsSoldInside,
   deckCards,
   finishCode,
   isDigitalBooster,
@@ -199,6 +202,34 @@ check('short names', () => {
   assert.equal(shortName('Commander Collection Green', 'Commander Collection: Green'), 'Commander Collection Green');
   assert.equal(shortName('The Big Box', 'The Hobbit'), 'The Big Box');
   assert.equal(shortName('Anthologies', 'Anthologies'), 'Anthologies');
+});
+
+check("a set file's content hash: 12 hex characters, the same for the same file, another for another", () => {
+  const file = { v: 1, code: 'XYZ', products: [{ id: 'a', short: 'Play Booster Pack' }] };
+  const h = contentHash(file);
+  assert.match(h, /^[0-9a-f]{12}$/);
+  assert.equal(contentHash(JSON.parse(JSON.stringify(file))), h, 'read back, the same');
+  assert.notEqual(contentHash({ ...file, products: [{ id: 'b', short: 'Play Booster Pack' }] }), h, 'another product, another hash');
+});
+
+check('packs sold only inside other products, flagged in the index', () => {
+  const pack = (id, sub = 'other') => ({ id, short: id, cat: 'booster_pack', sub, date: null, parts: [] });
+  const holder = (id, cat, parts) => ({ id, short: id, cat, sub: 'default', date: null, parts });
+  const products = [
+    pack('alone'),
+    pack('boxed'),
+    pack('inside'),
+    pack('theme', 'theme'),
+    pack('chosen'),
+    holder('box', 'booster_box', [['s', 'boxed', 36]]),
+    holder('game', 'bundle', [['s', 'inside', 8], ['s', 'boxed', 1]]),
+    holder('themes', 'subset', [['s', 'theme', 5]]),
+    holder('pick', 'bundle', [['v', [[1, [['s', 'chosen', 1]]]]]]),
+  ];
+  const inside = packsSoldInside(products);
+  assert.deepEqual([...inside].sort(), ['chosen', 'inside']);
+  assert.deepEqual(indexProduct({ ...pack('inside'), tcg: '12' }, inside), ['inside', 'booster_pack', 'other', null, '12', 1]);
+  assert.deepEqual(indexProduct(pack('alone'), inside), ['alone', 'booster_pack', 'other', null, null]);
 });
 
 console.log(`${passed} checks passed`);
