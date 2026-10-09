@@ -35,12 +35,12 @@
    "records": 3
   },
   "sld": {
-   "count": 12,
+   "count": 13,
    "bundleCount": 2820,
-   "scryfallCount": 2832,
+   "scryfallCount": 2833,
    "cards": "sld.json",
    "sigs": "sld.bin",
-   "records": 13
+   "records": 14
   }
  }
 }
