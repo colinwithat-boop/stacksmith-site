@@ -80,7 +80,10 @@ morning).
   `HARERUYA_FORCE=true node scripts/build-hareruya.mjs --dir _site/hareruya --raw-dir /tmp/hareruya --no-live`.
 - `prices/`: the day's prices for every paper printing, built from
   Scryfall's bulk data by `scripts/build-prices.mjs` in the daily deploy and
-  never committed. `version.json` names the current version's full file and
+  never committed: TCGplayer Market in dollars and Cardmarket's trend in
+  euros from Scryfall, and (since 2026-10-09) Cardmarket's cheapest listing
+  and 30-day average from its public price guide, by the card's
+  cardmarket_id, for the app's Cardmarket Low and Average levels. `version.json` names the current version's full file and
   the change file from the version before (the rows that differ, about
   half the size), which is what a phone holding yesterday's prices
   downloads; `latest.json` is the full file again for older app builds.

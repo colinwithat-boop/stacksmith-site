@@ -2,9 +2,13 @@
 // default_cards bulk data (every card in English, or in its printed
 // language when there is no English printing; ~80 MB gzipped JSONL): one
 // row per paper printing that has any price, as
-//   [scryfall id, usd, usd_foil, usd_etched, eur, eur_foil, tcgplayer id, tcgplayer etched id]
+//   [scryfall id, usd, usd_foil, usd_etched, eur, eur_foil, tcgplayer id, tcgplayer etched id,
+//    eur_low, eur_foil_low, eur_avg, eur_foil_avg]
 // with Scryfall's decimal strings (TCGplayer Market in dollars, Cardmarket
-// in euros) or null, and the ids as numbers or null. The layout (a full
+// in euros) or null, and the ids as numbers or null; the last four (since
+// 2026-10-09) are Cardmarket's cheapest listing and 30-day average sale,
+// non-foil and foil, from its public daily price guide by the card's
+// cardmarket_id, for the app's Cardmarket Low and Average levels. The layout (a full
 // file, the day's change file, version.json, latest.json) is
 // scripts/price-changes.mjs; the app applies it once a day
 // (lib/prices/priceFile.ts in the app repo).
@@ -166,6 +170,21 @@ if (version !== null && version.id !== id) {
 }
 console.log(prev === null ? '::warning::no previous file with an id: no change file this time' : `previous file ${prev.id}`);
 
+// Cardmarket's price guide: every product's low, trend and averages
+// (26 MB). Optional: without it the rows carry no Cardmarket levels (the
+// app shows no price under those two, as for a file from before them).
+const CARDMARKET_GUIDE = 'https://downloads.s3.cardmarket.com/productCatalog/priceGuide/price_guide_1.json';
+const guide = new Map();
+try {
+  const g = await (await fetch(CARDMARKET_GUIDE, { headers: { 'User-Agent': UA }, signal: AbortSignal.timeout(120_000) })).json();
+  if (!Array.isArray(g.priceGuides) || g.priceGuides.length < 10_000) throw new Error('not a price guide');
+  const money = (v) => (typeof v === 'number' && v > 0 ? v.toFixed(2) : null);
+  for (const p of g.priceGuides) guide.set(p.idProduct, [money(p.low), money(p['low-foil']), money(p.avg30), money(p['avg30-foil'])]);
+  console.log(`Cardmarket price guide of ${g.createdAt}: ${guide.size} products`);
+} catch (e) {
+  console.warn(`::warning::Cardmarket's price guide could not be read (${e instanceof Error ? e.message : e}): no Cardmarket levels today`);
+}
+
 const res = await fetch(url, { headers: { 'User-Agent': UA } });
 if (!res.ok || !res.body) throw new Error(`${res.status} for ${url}`);
 const num = (s) => (s === null || s === undefined ? null : s);
@@ -181,8 +200,9 @@ const take = (line) => {
   cards++;
   if (c.digital) return;
   const p = c.prices ?? {};
-  if (!p.usd && !p.usd_foil && !p.usd_etched && !p.eur && !p.eur_foil) return;
-  rows.push([c.id, num(p.usd), num(p.usd_foil), num(p.usd_etched), num(p.eur), num(p.eur_foil), c.tcgplayer_id ?? null, c.tcgplayer_etched_id ?? null]);
+  const cm = (c.cardmarket_id && guide.get(c.cardmarket_id)) || null;
+  if (!p.usd && !p.usd_foil && !p.usd_etched && !p.eur && !p.eur_foil && !cm) return;
+  rows.push([c.id, num(p.usd), num(p.usd_foil), num(p.usd_etched), num(p.eur), num(p.eur_foil), c.tcgplayer_id ?? null, c.tcgplayer_etched_id ?? null, ...(cm ?? [null, null, null, null])]);
 };
 for await (const chunk of Readable.fromWeb(res.body).pipe(createGunzip())) {
   rest += chunk.toString('utf8');
