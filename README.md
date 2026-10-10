@@ -94,6 +94,24 @@ morning).
   decks and kits only when the name has Latin words. Read once a day on
   the same rule as Hareruya (its `bigweb` input forces a read). By hand:
   `BIGWEB_FORCE=true node scripts/build-bigweb.mjs --dir _site/bigweb --raw-dir /tmp/bigweb --no-live [--max-sets 6]`.
+- `market/sealed.json`: what the current sealed products (the boosters,
+  boxes and bundles of the sets in the Packs tab's window) sell for at
+  Rakuten Ichiba and Yahoo! Shopping, in yen, through each one's official
+  item-search API (2026-10-10): `sources.rakuten` and `sources.yahoo`,
+  each `ja` and `en` maps of the app's product id to `[price, url,
+  seller]`, the cheapest offer in stock whose title confirms the set, the
+  kind, the unit, the language and the pack count
+  (`scripts/marketplace-data.mjs`, checked by
+  `scripts/marketplace-data-check.mjs`). Built by
+  `scripts/build-marketplaces.mjs`, one search per product and language
+  (a few hundred a run, one request a second per service), on the same
+  20-hour rule (the `market` input forces a run). Needs the repository
+  secrets RAKUTEN_APP_ID (a Rakuten Web Service application ID) and
+  YAHOO_CLIENT_ID (a Yahoo! JAPAN Developer Network client ID); a service
+  without its id is skipped. Both services require their credit wherever
+  the prices are shown ("Supported by Rakuten Developers" with a link;
+  "Web Services by Yahoo! JAPAN" with a link), which the app must carry.
+  Not yet run with keys.
 - `prices/`: the day's prices for every paper printing, built from
   Scryfall's bulk data by `scripts/build-prices.mjs` in the daily deploy and
   never committed: TCGplayer Market in dollars and Cardmarket's trend in

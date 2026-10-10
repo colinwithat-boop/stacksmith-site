@@ -49,6 +49,10 @@ on:
         description: "Read Bigweb again even when the live bigweb/ files are under 20 hours old."
         type: boolean
         default: false
+      market:
+        description: "Ask Rakuten and Yahoo! Shopping again even when the live market/ file is under 20 hours old."
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -176,6 +180,28 @@ jobs:
               curl -fsSL "${SITE_URL}bigweb/$f" -o "_site/bigweb/$f" || rm -f "_site/bigweb/$f"
             done
             echo "::warning::The Bigweb build failed; the live files were republished."
+          fi
+      # The marketplaces' sealed prices (the owner, 2026-10-10: Rakuten and
+      # Yahoo! Shopping for sealed only; scripts/build-marketplaces.mjs):
+      # each current booster, box and bundle searched for through the two
+      # official item-search APIs, one request a second per service, only
+      # when the live market/sealed.json is over 20 hours old (or the market
+      # input is ticked). Needs the two repository secrets; without them the
+      # step publishes the live file again and says so.
+      - name: Build the marketplace sealed prices
+        continue-on-error: true
+        timeout-minutes: 45
+        env:
+          MARKET_FORCE: ${{ inputs.market == true }}
+          RAKUTEN_APP_ID: ${{ secrets.RAKUTEN_APP_ID }}
+          YAHOO_CLIENT_ID: ${{ secrets.YAHOO_CLIENT_ID }}
+        run: node scripts/marketplace-data-check.mjs && node scripts/build-marketplaces.mjs --dir _site/market
+      - name: Keep the last marketplace file if the build failed
+        run: |
+          if [ ! -f _site/market/sealed.json ]; then
+            mkdir -p _site/market
+            curl -fsSL "${SITE_URL}market/sealed.json" -o _site/market/sealed.json || rm -f _site/market/sealed.json
+            echo "::warning::The marketplace build failed; the live file was republished."
           fi
       # The files on Cloudflare Pages (https://stacksmith-app.pages.dev/),
       # where the app reads them (static requests free and unmetered).
