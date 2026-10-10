@@ -223,6 +223,14 @@ check('a sealed listing: kind, packs, set codes, refused states', () => {
   assert.deepEqual(portal.codes, ['POR']);
   assert.equal(parseSealedName('【黒枠】(1パック)《第4版 ブースターパック〇日本語版》[4EDBB] ※外装傷アリ品', '', 'pack'), null);
   assert.equal(parseSealedName('(1パック)《ベータ ブースターパック●英語版》[LEB] PSA9', '', 'pack'), null);
+  // The name beats the category (2026-10-10): a one-pack listing filed
+  // under boxes is a pack, a BOX filed under packs is a box, and a pack
+  // named with no count under boxes is a pack.
+  const rvr = parseSealedName('(1パック)《ラヴニカ・リマスタードラフト・ブースターパック〇日本語版》[RVR]', '(1Pack)《Ravnica Remastered Draft Booster Pack[JP]》[RVR]', 'box');
+  assert.deepEqual(rvr.kind, { cat: 'booster_pack', sub: 'draft' });
+  assert.deepEqual(parseSealedName('(12パック)《ラヴニカ・リマスター コレクター・ブースターBOX》《○日本語版》[RVR]', '(12Packs)《Ravnica Remastered Collector Booster BOX[JP]》[RVR]', 'box').kind, { cat: 'booster_box', sub: 'collector' });
+  assert.deepEqual(parseSealedName('《ファウンデーションズ プレイ・ブースターBOX》《○日本語版》[FDN]', '《Foundations Play Booster BOX[JP]》', 'pack').kind, { cat: 'booster_box', sub: 'play' });
+  assert.deepEqual(parseSealedName('《ファウンデーションズ プレイ・ブースターパック》《○日本語版》[FDN]', '《Foundations Play Booster Pack[JP]》', 'box').kind, { cat: 'booster_pack', sub: 'play' });
 });
 
 check('deck words leave the set, the kind and the language out', () => {
@@ -253,15 +261,22 @@ check('a sealed match: boosters by kind, a kit and decks by name, a set of decks
   assert.equal(m('《ファウンデーションズ スターターキット ●英語版》[FDN]', '《Foundations Starter Kit[EN]》', 'pack'), 'p7');
   assert.equal(m('《カルドハイム 統率者デッキ「エルフの帝国」》《●英語版》[KHC]', '【EN】《Kaldheim Commander Elven Empire》[KHC]', 'deck'), 'p8');
   assert.equal(m('《カルドハイム 統率者デッキ2種セット》《●英語版》[KHC]', '【EN】《Kaldheim Commander Deck Set of two》[KHC]', 'deck'), 'p10');
+  // Ravnica Remastered's one-pack listing under boxes prices the pack, not the box (2026-10-10).
+  const rvrProducts = [
+    { id: 'r1', name: 'Ravnica Remastered Draft Booster Box', short: 'Draft Booster Box', cat: 'booster_box', sub: 'default' },
+    { id: 'r2', name: 'Ravnica Remastered Draft Booster Pack', short: 'Draft Booster Pack', cat: 'booster_pack', sub: 'default' },
+  ];
+  assert.equal(matchSealed(parseSealedName('(1パック)《ラヴニカ・リマスタードラフト・ブースターパック〇日本語版》[RVR]', '(1Pack)《Ravnica Remastered Draft Booster Pack[JP]》[RVR]', 'box'), rvrProducts, 'ja')?.id, 'r2');
   // "Kaldheim Commander" alone fits two decks: no match.
   assert.equal(m('《カルドハイム 統率者デッキ》《●英語版》[KHC]', '【EN】《Kaldheim Commander》[KHC]', 'deck'), null);
   assert.equal(matchSealed(null, products), null);
 });
 
 check('the sealed file', () => {
-  const body = sealedBody({ built: 'B', scraped: 'S', ja: { b: [100, 2], a: [50, 1] }, en: {}, counts: { sealed: 2 } });
+  const body = sealedBody({ built: 'B', scraped: 'S', ja: { b: [100, 2, 1], a: [50, 1, 0] }, en: {}, counts: { sealed: 2 } });
   const parsed = JSON.parse(body);
   assert.equal(parsed.currency, 'JPY');
+  assert.deepEqual(parsed.ja.a, [50, 1, 0], 'the stock cell stays');
   assert.deepEqual(Object.keys(parsed.ja), ['a', 'b']);
   assert.deepEqual(parsed.en, {});
 });

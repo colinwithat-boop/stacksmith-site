@@ -394,7 +394,8 @@ for (const d of sealedDocs) {
   if (!have || (stock && !have[2]) || (stock === Boolean(have[2]) && price < have[0])) into[hit.id] = [price, Number(d.product), stock ? 1 : 0];
   sealedMatched++;
 }
-for (const o of [ja, en]) for (const k of Object.keys(o)) o[k] = o[k].slice(0, 2);
+// The third cell, 1 in stock or 0 sold out, stays: the app leaves a sold-out
+// product out of its "best value" strip and says so by its price (2026-10-10).
 console.log(`${sealedSeen.size} sealed products: ${sealedMatched} matched (${Object.keys(ja).length} Japanese, ${Object.keys(en).length} English)`);
 for (const [reason, r] of [...sealedWhy].sort((a, b) => b[1].count - a[1].count)) console.log(`  ${r.count} ${reason}`);
 

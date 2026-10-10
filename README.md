@@ -67,7 +67,8 @@ morning).
   page is `https://www.hareruyamtg.com/ja/products/detail/<product>`.
   `sealed.json` holds the sealed products' prices by the app's product id
   (the sealed set files' `id`), under `ja` and `en`, each `[price,
-  product]`. `report.json` says what did not match and why. Built by
+  product, in stock]` (1 in stock, 0 sold out; the app leaves a sold-out
+  product out of its best-value strip). `report.json` says what did not match and why. Built by
   `scripts/build-hareruya.mjs` from Hareruya's own product search (JSON,
   one document per SKU, read set by set with one request every 0.4 s,
   ~600 a run) and Scryfall's bulk data (the set code and collector number

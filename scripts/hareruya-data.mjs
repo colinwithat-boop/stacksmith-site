@@ -431,12 +431,22 @@ export function parseSealedName(name, nameEn, category) {
   else if (/ドラフト・?ブースター|Draft Booster/i.test(both)) booster = 'draft';
   else if (/ブースター|Booster/i.test(both)) booster = 'default';
   let kind = null;
+  // The name's own words beat the category a listing sits under (2026-10-10:
+  // Ravnica Remastered's "(1パック)…ドラフト・ブースターパック" was filed
+  // under boxes, and its 1,000 yen stood as the box's): "(1パック)" is a
+  // pack whatever the category, a name saying パック/Pack with no BOX in it
+  // too; a box needs a count above one, BOX in its name, or the box
+  // category with no count against it.
+  const plain = both.replace(/(s*d+s*(?:パック|Packs?)s*)/gi, ' ');
+  const saysBox = /BOX|ボックス|Box/i.test(plain);
+  const saysPack = !saysBox && /パック|Packs?/i.test(plain);
   // A kit (a Starter Kit is two decks) and anything under the pack and box
   // categories that is not a booster are matched by name, below.
   if (/キット|\bKit\b/i.test(both)) kind = { cat: null, sub: null };
   else if (/ケース|Case\b/i.test(both) && booster && (category === 'box' || category === 'other')) kind = { cat: 'booster_case', sub: booster };
-  else if (booster && (category === 'box' || (n !== null && n > 1))) kind = { cat: 'booster_box', sub: booster };
-  else if (booster && (category === 'pack' || n === 1)) kind = { cat: 'booster_pack', sub: booster };
+  else if (booster && (n === 1 || (saysPack && !(n !== null && n > 1)))) kind = { cat: 'booster_pack', sub: booster };
+  else if (booster && (category === 'box' || (n !== null && n > 1) || saysBox)) kind = { cat: 'booster_box', sub: booster };
+  else if (booster && category === 'pack') kind = { cat: 'booster_pack', sub: booster };
   else if (category === 'bundle' || /Bundle|バンドル|ファットパック|Fat Pack/i.test(both)) kind = { cat: 'bundle', sub: /ギフト|Gift/i.test(both) ? 'gift_bundle' : /ファットパック|Fat Pack/i.test(both) ? 'fat_pack' : 'default' };
   else if (/プレリリース|Prerelease/i.test(both)) kind = { cat: 'limited_aid_tool', sub: 'prerelease_kit' };
   else if (/統率者|Commander/i.test(both)) kind = { cat: 'deck', sub: 'commander' };
