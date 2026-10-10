@@ -348,7 +348,10 @@ const FINISH_SLOT = { nonfoil: 0, foil: 1, etched: 2 };
 
 /**
  * The cards file's rows from pickPrices' cells, sorted by id:
- *   [scryfall id, ja, ja_foil, ja_etched, en, en_foil, en_etched, product]
+ *   [scryfall id, ja, ja_foil, ja_etched, en, en_foil, en_etched, product, stock]
+ * the last (since 2026-10-10) a bitmask of the cells in stock (bit 0 ja,
+ * 1 ja_foil, 2 ja_etched, 3 en, 4 en_foil, 5 en_etched), for the Japan
+ * merge (scripts/japan-data.mjs); a reader from before ignores it;
  * prices in yen (integers) or null; `product` is the Hareruya product id of
  * the cheapest cell (the card's page there).
  */
@@ -358,16 +361,17 @@ export function cardRows(cells) {
     const [id, lang, finish] = key.split('|');
     let row = rows.get(id);
     if (!row) {
-      row = [id, null, null, null, null, null, null, null, Infinity];
+      row = [id, null, null, null, null, null, null, null, Infinity, 0];
       rows.set(id, row);
     }
     row[1 + (lang === 'en' ? 3 : 0) + FINISH_SLOT[finish]] = cell.price;
+    if (cell.stock) row[9] |= 1 << ((lang === 'en' ? 3 : 0) + FINISH_SLOT[finish]);
     if (cell.price < row[8]) {
       row[8] = cell.price;
       row[7] = Number(cell.product);
     }
   }
-  return [...rows.values()].map((r) => r.slice(0, 8)).sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
+  return [...rows.values()].map((r) => [...r.slice(0, 8), r[9]]).sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
 }
 
 /** The cards file's text: one row per line. */

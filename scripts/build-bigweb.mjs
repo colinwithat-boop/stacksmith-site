@@ -8,7 +8,7 @@
 //   bigweb/cards.json   one row per Scryfall printing Bigweb sells:
 //                       [scryfall id, ja, ja_foil, ja_etched, en, en_foil,
 //                       en_etched, product], yen or null; `product` opens
-//                       the card's page: https://www.bigweb.co.jp/ja/products/mtg/<product>
+//                       the card's page: https://www.bigweb.co.jp/ja/products/mtg/cardViewer/<product>
 //   bigweb/sealed.json  the sealed products' prices by the app's product id
 //                       (the sealed set files' `id`), under `ja` and `en`,
 //                       each [price, product, in stock].

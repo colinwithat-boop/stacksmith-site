@@ -183,8 +183,8 @@ check('the cheapest NM copy in stock per printing, language and finish; the rows
   ]);
   const rows = cardRows(cells);
   assert.deepEqual(rows, [
-    ['a', 450, null, 1200, 300, 900, null, 13],
-    ['b', null, null, null, 80, null, null, 18],
+    ['a', 450, null, 1200, 300, 900, null, 13, 0b010101], // in stock: ja, ja_etched, en_foil
+    ['b', null, null, null, 80, null, null, 18, 0b001000],
   ]);
   const body = cardsBody({ built: 'B', scraped: 'S', rows, counts: { skus: 10 } });
   const parsed = JSON.parse(body);

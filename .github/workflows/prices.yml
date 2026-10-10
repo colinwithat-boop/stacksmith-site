@@ -203,6 +203,20 @@ jobs:
             curl -fsSL "${SITE_URL}market/sealed.json" -o _site/market/sealed.json || rm -f _site/market/sealed.json
             echo "::warning::The marketplace build failed; the live file was republished."
           fi
+      # The Japan source: the shops' files merged, the cheapest in stock per
+      # cell and the shop that has it (scripts/build-japan.mjs; no requests).
+      - name: Merge the Japanese shops into the Japan files
+        continue-on-error: true
+        run: node scripts/japan-data-check.mjs && node scripts/build-japan.mjs --site _site
+      - name: Keep the last Japan files if the merge failed
+        run: |
+          if [ ! -f _site/japan/cards.json ]; then
+            mkdir -p _site/japan
+            for f in cards.json sealed.json; do
+              curl -fsSL "${SITE_URL}japan/$f" -o "_site/japan/$f" || rm -f "_site/japan/$f"
+            done
+            echo "::warning::The Japan merge failed; the live files were republished."
+          fi
       # The files on Cloudflare Pages (https://stacksmith-app.pages.dev/),
       # where the app reads them (static requests free and unmetered).
       # Needs two repository secrets: CLOUDFLARE_API_TOKEN (an account API

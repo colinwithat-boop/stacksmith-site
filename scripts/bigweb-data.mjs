@@ -79,7 +79,8 @@ export function parseBigwebSingle(item) {
   const inComment = comment.match(/^\s*(\d+[a-z★]*)\s*(?:<br>|$)/);
   const number = inName ? inName[2] : inComment ? inComment[1] : null;
   if (!name) return null;
-  const etched = /エッチング/i.test(`${condition} ${rawName} ${item.sale_words ?? ''}`);
+  // An etched foil is a 特殊FOIL whose comment says so ("105<br>Etched Foil").
+  const etched = /エッチング|etched/i.test(`${condition} ${item.sale_words ?? ''} ${comment}`);
   const finish = etched ? 'etched' : /FOIL/i.test(condition) ? 'foil' : 'nonfoil';
   const { set, variant, raw } = bigwebSet(item.cardset?.slip ?? item.cardset?.code);
   const stock = !item.is_sold_out && !item.is_preorder_item && Number(item.stock_count) > 0;

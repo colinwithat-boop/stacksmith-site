@@ -47,6 +47,8 @@ check('a single: name, number, language, finish, stock; what is not one', () => 
   assert.equal(variant.variant, 'BF');
   assert.equal(parseBigwebSingle(item({ name: 'Emrakul, the Exigent Doom(413', condition: SPECIAL_FOIL, comment: 'なんば店で展示中 413 #0208' })).finish, 'foil');
   assert.equal(parseBigwebSingle(item({ name: 'Emrakul, the Exigent Doom', comment: '413<br>x' })).number, '413', 'the number from the comment alone');
+  assert.equal(parseBigwebSingle(item({ name: 'Lightning Bolt', condition: SPECIAL_FOIL, comment: '105<br>Etched Foil' })).finish, 'etched', 'an etched foil says so in the comment');
+  assert.equal(parseBigwebSingle(item({ name: 'Etched Champion', condition: NM })).finish, 'nonfoil', 'a name alone never makes it etched');
   assert.equal(parseBigwebSingle(item({ stock_count: 0 })).stock, false);
   assert.equal(parseBigwebSingle(item({ is_sold_out: true, stock_count: 3 })).stock, false);
   assert.equal(parseBigwebSingle(item({ is_preorder_item: true })).stock, false, 'a preorder is not a shelf price');

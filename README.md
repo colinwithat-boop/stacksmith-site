@@ -82,7 +82,7 @@ morning).
 - `bigweb/`: the same three files for Bigweb (BIG MAGIC, bigweb.co.jp),
   the second Japanese shop (2026-10-10), shaped exactly as `hareruya/`'s
   with `"source": "bigweb"`; a card's page is
-  `https://www.bigweb.co.jp/ja/products/mtg/<product>`. Built by
+  `https://www.bigweb.co.jp/ja/products/mtg/cardViewer/<product>`. Built by
   `scripts/build-bigweb.mjs` from Bigweb's own product API
   (api.bigweb.co.jp, JSON, 100 listings a page: the set list once, every
   set whose code names a Scryfall set page by page, the sealed goods
@@ -112,6 +112,17 @@ morning).
   the prices are shown ("Supported by Rakuten Developers" with a link;
   "Web Services by Yahoo! JAPAN" with a link), which the app must carry.
   Not yet run with keys.
+- `japan/`: the app's "Japan" price source (2026-10-10, the owner: the
+  cheapest in stock across the shops, the Buy link to whichever has it):
+  `cards.json` and `sealed.json` merged from `hareruya/` and `bigweb/` by
+  `scripts/build-japan.mjs` (no requests: what the run just built or
+  republished) through `scripts/japan-data.mjs`, checked by
+  `scripts/japan-data-check.mjs`. Per printing each cell is the cheapest
+  IN-STOCK price across the shops, else the cheapest listed, and the row
+  ends `[..., product, shop, stock]`: the shop ("hareruya" or "bigweb")
+  whose product id that is, the shop of the cheapest in-stock cell, and
+  the in-stock bitmask (the shops' own files carry the same mask as their
+  ninth cell). Sealed cells are `[price, product, in stock, shop]`.
 - `prices/`: the day's prices for every paper printing, built from
   Scryfall's bulk data by `scripts/build-prices.mjs` in the daily deploy and
   never committed: TCGplayer Market in dollars and Cardmarket's trend in
