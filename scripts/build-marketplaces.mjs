@@ -27,8 +27,11 @@
 // or 403, or a 400 about the keys, means the keys or the application's
 // registration were refused: one error line, the run stops, and nothing
 // is published (exit 1), so the workflow keeps the live file instead of
-// one missing a marketplace under a fresh date. Both services require
-// their credit wherever the prices are shown (the app's job).
+// one missing a marketplace under a fresh date; the same when a service
+// accepted not one request of the run (a 2xx or a 404), whatever it
+// answered, since that too would publish a marketplace empty. Both
+// services require their credit wherever the prices are shown (the
+// app's job).
 //
 //   node scripts/build-marketplaces.mjs [--dir _site/market] [--no-live] [--max-products N] [--raw-dir <dir>]
 import crypto from 'node:crypto';
@@ -151,6 +154,8 @@ console.log(`${limited.length} searches for ${new Set(limited.map((a) => a.id)).
 // service whose keys or registration are refused is stopped after one
 // error line, and the run with it (nothing is published, see the end).
 let requests = 0;
+const asked = { rakuten: 0, yahoo: 0 };
+const accepted = { rakuten: false, yahoo: false }; // a 2xx or a 404 seen: the service takes our requests
 const lastAt = { rakuten: 0, yahoo: 0 };
 const stopped = { rakuten: null, yahoo: null };
 const HEADERS = {
@@ -168,9 +173,13 @@ async function ask(service, url) {
     if (wait > 0) await sleep(wait);
     lastAt[service] = Date.now();
     requests++;
+    asked[service]++;
     try {
       const res = await fetch(url, { headers: HEADERS[service], signal: AbortSignal.timeout(60_000) });
-      if (res.status === 404) return NOTHING;
+      if (res.status === 404) {
+        accepted[service] = true;
+        return NOTHING;
+      }
       if (res.status === 400 || res.status === 401 || res.status === 403) {
         // Never the URL or the headers here: they carry the keys.
         const body = (await res.text().catch(() => '')).replace(/\s+/g, ' ').slice(0, 300);
@@ -184,6 +193,7 @@ async function ask(service, url) {
       }
       if (res.status === 429 || res.status >= 500) throw new Error(`${res.status}`);
       if (!res.ok) throw new Error(`${res.status}`);
+      accepted[service] = true;
       const text = await res.text();
       const data = JSON.parse(text);
       if (key) {
@@ -235,6 +245,13 @@ for (const a of limited) {
   if (done % 100 === 0) console.log(`${done} of ${limited.length} searches, ${requests} requests`);
 }
 counts.requests = requests;
+counts.asked = asked;
+for (const service of ['rakuten', 'yahoo']) {
+  if (!stopped[service] && asked[service] > 0 && !accepted[service]) {
+    stopped[service] = 'no request accepted';
+    console.error(`::error::${service}: not one of ${asked[service]} requests was accepted (a 2xx or a 404): a parameter or the keys are wrong`);
+  }
+}
 const built = new Date().toISOString();
 write('report.json', JSON.stringify({ built, counts, stopped, skippedSets }, null, 1));
 const refused = Object.keys(stopped).filter((s) => stopped[s]);
