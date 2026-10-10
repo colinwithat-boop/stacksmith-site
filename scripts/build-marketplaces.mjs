@@ -9,13 +9,26 @@
 //
 //   market/sealed.json  {v, currency, built, since, counts, sources: {rakuten: {ja: {<product id>: [price, url, seller]}, en: {...}}, yahoo: {...}}}
 //
-// Needs RAKUTEN_APP_ID (Rakuten Web Service application ID) and
-// YAHOO_CLIENT_ID (Yahoo! JAPAN Developer Network client ID); a service
-// whose id is not set is skipped, and with neither set the live file is
-// published again. One request a second per service, one per product and
-// language (a few hundred a run), and a run only when the live file is
-// older than MAX_AGE_H hours (or MARKET_FORCE=true). Both services
-// require their credit wherever the prices are shown (the app's job).
+// Needs RAKUTEN_APP_ID with RAKUTEN_ACCESS_KEY (a Rakuten Developers
+// application's ID and access key: the API moved to openapi.rakuten.co.jp
+// on 2026-02-10, the old host stopped on 2026-05-14, and every request now
+// carries the access key, sent as the `accessKey` header the documentation
+// names) and YAHOO_CLIENT_ID (a Yahoo! JAPAN Developer Network client ID);
+// a service without its keys is skipped, and with none set the live file
+// is published again. RAKUTEN_AFFILIATE_ID is optional: with it Rakuten
+// answers affiliate links, which are kept as the item URLs. The Rakuten
+// application is registered as a Web application allowed the site's
+// domain (the backend type wants a list of fixed addresses, which the
+// workflow's runners do not have), so each Rakuten request names the site
+// as Referer and Origin. Rakuten is asked at most every 1.5 s and Yahoo
+// every second (SPACING_MS), one search per product and language (a few
+// hundred a run), and a run only when the live file is older than
+// MAX_AGE_H hours (or MARKET_FORCE=true). A 404 is "nothing found". A 401
+// or 403, or a 400 about the keys, means the keys or the application's
+// registration were refused: one error line, the run stops, and nothing
+// is published (exit 1), so the workflow keeps the live file instead of
+// one missing a marketplace under a fresh date. Both services require
+// their credit wherever the prices are shown (the app's job).
 //
 //   node scripts/build-marketplaces.mjs [--dir _site/market] [--no-live] [--max-products N] [--raw-dir <dir>]
 import crypto from 'node:crypto';
@@ -40,8 +53,12 @@ const FORCE = process.env.MARKET_FORCE === 'true';
 const MAX_AGE_H = Number(process.env.MARKET_MAX_AGE_H || '20');
 const UA = 'Stacksmith prices (https://stacksmith-app.pages.dev/; stackscanapp@gmail.com)';
 const RAKUTEN_APP_ID = process.env.RAKUTEN_APP_ID || '';
+const RAKUTEN_ACCESS_KEY = process.env.RAKUTEN_ACCESS_KEY || '';
+const RAKUTEN_AFFILIATE_ID = process.env.RAKUTEN_AFFILIATE_ID || '';
+const RAKUTEN = Boolean(RAKUTEN_APP_ID && RAKUTEN_ACCESS_KEY);
 const YAHOO_CLIENT_ID = process.env.YAHOO_CLIENT_ID || '';
-const SPACING_MS = 1000;
+const SPACING_MS = { rakuten: 1500, yahoo: 1000 };
+const SITE_ORIGIN = new URL(SITE_URL).origin;
 const WINDOW_YEARS = 3;
 const SETS_DIR = path.join(ROOT, 'sealed', 'sets');
 
@@ -70,9 +87,12 @@ if (liveText === undefined) {
   console.error('::error::the live market/sealed.json could not be read: the live file is left as it is');
   process.exit(1);
 }
-if (!RAKUTEN_APP_ID && !YAHOO_CLIENT_ID) {
+if (Boolean(RAKUTEN_APP_ID) !== Boolean(RAKUTEN_ACCESS_KEY)) {
+  console.warn('::warning::Rakuten needs both RAKUTEN_APP_ID and RAKUTEN_ACCESS_KEY: Rakuten was not asked.');
+}
+if (!RAKUTEN && !YAHOO_CLIENT_ID) {
   if (liveText) write('sealed.json', liveText);
-  console.log('::notice::No RAKUTEN_APP_ID or YAHOO_CLIENT_ID: the marketplaces were not asked' + (liveText ? '; the live file was published again.' : '.'));
+  console.log('::notice::No Rakuten keys and no YAHOO_CLIENT_ID: the marketplaces were not asked' + (liveText ? '; the live file was published again.' : '.'));
   process.exit(0);
 }
 if (!FORCE && liveText) {
@@ -126,16 +146,42 @@ for (const file of fs.readdirSync(SETS_DIR)) {
 const limited = MAX_PRODUCTS ? asks.slice(0, MAX_PRODUCTS) : asks;
 console.log(`${limited.length} searches for ${new Set(limited.map((a) => a.id)).size} products of the sets since ${since} (${skippedSets.length} sets without a Japanese name skipped)`);
 
-// ---- The services, one request a second each.
+// ---- The services: a minimum gap between the requests to each; a 404 is
+// "nothing found" (Rakuten's documentation), not a failure to retry; a
+// service whose keys or registration are refused is stopped after one
+// error line, and the run with it (nothing is published, see the end).
 let requests = 0;
+const lastAt = { rakuten: 0, yahoo: 0 };
+const stopped = { rakuten: null, yahoo: null };
+const HEADERS = {
+  rakuten: { 'User-Agent': UA, Accept: 'application/json', accessKey: RAKUTEN_ACCESS_KEY, Referer: SITE_URL, Origin: SITE_ORIGIN },
+  yahoo: { 'User-Agent': UA, Accept: 'application/json' },
+};
+const KEY_WORDS = /applicationId|accessKey|access_key|appid|client_ip|referer|referrer|forbidden|unauthori[sz]ed/i;
+const NOTHING = {};
 async function ask(service, url) {
+  if (stopped[service]) return null;
   const key = RAW_DIR ? path.join(RAW_DIR, `${service}-${crypto.createHash('sha1').update(url).digest('hex')}.json`) : null;
   if (key && fs.existsSync(key)) return JSON.parse(fs.readFileSync(key, 'utf8'));
   for (let attempt = 0; ; attempt++) {
-    await sleep(SPACING_MS);
+    const wait = SPACING_MS[service] - (Date.now() - lastAt[service]);
+    if (wait > 0) await sleep(wait);
+    lastAt[service] = Date.now();
     requests++;
     try {
-      const res = await fetch(url, { headers: { 'User-Agent': UA, Accept: 'application/json' }, signal: AbortSignal.timeout(60_000) });
+      const res = await fetch(url, { headers: HEADERS[service], signal: AbortSignal.timeout(60_000) });
+      if (res.status === 404) return NOTHING;
+      if (res.status === 400 || res.status === 401 || res.status === 403) {
+        // Never the URL or the headers here: they carry the keys.
+        const body = (await res.text().catch(() => '')).replace(/\s+/g, ' ').slice(0, 300);
+        if (res.status !== 400 || KEY_WORDS.test(body)) {
+          stopped[service] = `${res.status} ${body}`;
+          console.error(`::error::${service}: ${res.status} ${body}: the keys or the application's registration were refused; ${service} is not asked again this run`);
+        } else {
+          console.warn(`${service}: 400 ${body}: given up for this search`);
+        }
+        return null;
+      }
       if (res.status === 429 || res.status >= 500) throw new Error(`${res.status}`);
       if (!res.ok) throw new Error(`${res.status}`);
       const text = await res.text();
@@ -155,8 +201,12 @@ async function ask(service, url) {
   }
 }
 
+// Ichiba Item Search 2026-07-01 on the new host; formatVersion 2 is the flat
+// items array, elements the fields read and nothing else (affiliateUrl only
+// comes with an affiliate id, and itemUrl is then the same link).
+const RAKUTEN_ELEMENTS = 'itemName,itemPrice,itemUrl,affiliateUrl,shopName,availability';
 const rakutenUrl = (text) =>
-  `https://app.rakuten.co.jp/services/api/IchibaItem/Search/20220601?format=json&applicationId=${encodeURIComponent(RAKUTEN_APP_ID)}&keyword=${encodeURIComponent(text)}&availability=1&sort=${encodeURIComponent('+itemPrice')}&hits=30`;
+  `https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20260701?format=json&formatVersion=2&applicationId=${encodeURIComponent(RAKUTEN_APP_ID)}${RAKUTEN_AFFILIATE_ID ? `&affiliateId=${encodeURIComponent(RAKUTEN_AFFILIATE_ID)}` : ''}&keyword=${encodeURIComponent(text)}&availability=1&sort=${encodeURIComponent('+itemPrice')}&hits=30&elements=${RAKUTEN_ELEMENTS}`;
 const yahooUrl = (text) =>
   `https://shopping.yahooapis.jp/ShoppingWebService/V3/itemSearch?appid=${encodeURIComponent(YAHOO_CLIENT_ID)}&query=${encodeURIComponent(text)}&in_stock=true&sort=${encodeURIComponent('+price')}&results=30`;
 
@@ -164,7 +214,8 @@ const sources = { rakuten: { ja: {}, en: {} }, yahoo: { ja: {}, en: {} } };
 const counts = { searches: limited.length, rakuten: 0, yahoo: 0, requests: 0 };
 let done = 0;
 for (const a of limited) {
-  if (RAKUTEN_APP_ID) {
+  if (stopped.rakuten || stopped.yahoo) break;
+  if (RAKUTEN) {
     const data = await ask('rakuten', rakutenUrl(a.query.text));
     const offer = data ? pickOffer(a.query, rakutenOffers(data)) : null;
     if (offer) {
@@ -185,6 +236,12 @@ for (const a of limited) {
 }
 counts.requests = requests;
 const built = new Date().toISOString();
+write('report.json', JSON.stringify({ built, counts, stopped, skippedSets }, null, 1));
+const refused = Object.keys(stopped).filter((s) => stopped[s]);
+if (refused.length) {
+  // Not a file missing a marketplace under a fresh date: the workflow's next step keeps the live one.
+  console.error(`::error::${refused.join(' and ')} refused the keys or the registration (above): nothing published, the live file stays.`);
+  process.exit(1);
+}
 write('sealed.json', marketplaceBody({ built, since, sources, counts }));
-write('report.json', JSON.stringify({ built, counts, skippedSets }, null, 1));
 console.log(`Done: Rakuten ${counts.rakuten}, Yahoo ${counts.yahoo} of ${limited.length} searches, ${requests} requests`);

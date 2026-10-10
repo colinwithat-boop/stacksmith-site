@@ -101,13 +101,18 @@ export function offerMatches(query, title) {
   return true;
 }
 
-/** Rakuten's answer (IchibaItem Search 20220601) as offers: {price, url, title, seller, stock}. */
+/**
+ * Rakuten's answer (IchibaItem Search 20260701: a lowercase `items` array,
+ * flat with formatVersion 2 or each in an `item` wrapper; the older `Items`
+ * and `Item` are read too) as offers: {price, url, title, seller, stock}.
+ * The affiliate link, when the request carried an affiliate id, is the URL.
+ */
 export function rakutenOffers(json) {
-  const items = Array.isArray(json?.Items) ? json.Items : [];
+  const items = Array.isArray(json?.items) ? json.items : Array.isArray(json?.Items) ? json.Items : [];
   return items
-    .map((it) => (it && it.Item) || it)
+    .map((it) => (it && (it.item || it.Item)) || it)
     .filter((it) => it && typeof it === 'object')
-    .map((it) => ({ price: Number(it.itemPrice), url: String(it.itemUrl ?? ''), title: String(it.itemName ?? ''), seller: String(it.shopName ?? ''), stock: Number(it.availability) === 1 }))
+    .map((it) => ({ price: Number(it.itemPrice), url: String(it.affiliateUrl || it.itemUrl || ''), title: String(it.itemName ?? ''), seller: String(it.shopName ?? ''), stock: Number(it.availability) === 1 }))
     .filter((o) => Number.isFinite(o.price) && o.price > 0 && o.url);
 }
 

@@ -104,14 +104,25 @@ morning).
   (`scripts/marketplace-data.mjs`, checked by
   `scripts/marketplace-data-check.mjs`). Built by
   `scripts/build-marketplaces.mjs`, one search per product and language
-  (a few hundred a run, one request a second per service), on the same
-  20-hour rule (the `market` input forces a run). Needs the repository
-  secrets RAKUTEN_APP_ID (a Rakuten Web Service application ID) and
-  YAHOO_CLIENT_ID (a Yahoo! JAPAN Developer Network client ID); a service
-  without its id is skipped. Both services require their credit wherever
-  the prices are shown ("Supported by Rakuten Developers" with a link;
-  "Web Services by Yahoo! JAPAN" with a link), which the app must carry.
-  Not yet run with keys.
+  (a few hundred a run; Rakuten at most every 1.5 s, Yahoo every second),
+  on the same 20-hour rule (the `market` input forces a run). Needs the
+  repository secrets RAKUTEN_APP_ID and RAKUTEN_ACCESS_KEY (a Rakuten
+  Developers application's ID and access key: Rakuten's API moved to
+  openapi.rakuten.co.jp in February 2026 and the old host stopped on
+  2026-05-14; the application is registered as a Web application allowed
+  `stacksmith-app.pages.dev`, and the reader names the site as Referer
+  and Origin, since the backend type wants fixed addresses the runners do
+  not have; Rakuten's applications expire after a year and are extended
+  with the dashboard's button), RAKUTEN_AFFILIATE_ID (optional: with it
+  Rakuten's links are affiliate links) and YAHOO_CLIENT_ID (a Yahoo! JAPAN
+  Developer Network client ID; itemSearch V3 needs no approval); a
+  service without its keys is skipped. Refused keys (a 401 or 403, or a
+  400 naming them) stop the run with one error line and publish nothing,
+  so the live file stays; a 404 is "nothing found". Both services require
+  their credit wherever the prices are shown ("Supported by Rakuten
+  Developers" with a link; "Web Services by Yahoo! JAPAN" with a link),
+  which the app carries. Not yet run with keys: the first keyed run is
+  the live test.
 - `japan/`: the app's "Japan" price source (2026-10-10, the owner: the
   cheapest in stock across the shops, the Buy link to whichever has it):
   `cards.json` and `sealed.json` merged from `hareruya/` and `bigweb/` by

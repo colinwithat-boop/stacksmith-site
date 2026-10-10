@@ -184,16 +184,24 @@ jobs:
       # The marketplaces' sealed prices (the owner, 2026-10-10: Rakuten and
       # Yahoo! Shopping for sealed only; scripts/build-marketplaces.mjs):
       # each current booster, box and bundle searched for through the two
-      # official item-search APIs, one request a second per service, only
-      # when the live market/sealed.json is over 20 hours old (or the market
-      # input is ticked). Needs the two repository secrets; without them the
-      # step publishes the live file again and says so.
+      # official item-search APIs, Rakuten at most every 1.5 s and Yahoo
+      # every second, only when the live market/sealed.json is over 20
+      # hours old (or the market input is ticked). Needs the repository
+      # secrets: RAKUTEN_APP_ID and RAKUTEN_ACCESS_KEY (a Rakuten Developers
+      # application registered as a Web application allowed the site's
+      # domain; Rakuten's applications expire after a year and are extended
+      # in its dashboard), RAKUTEN_AFFILIATE_ID (optional: affiliate links)
+      # and YAHOO_CLIENT_ID. Without them the step publishes the live file
+      # again and says so; refused keys fail the step with one error line,
+      # and the next step keeps the live file.
       - name: Build the marketplace sealed prices
         continue-on-error: true
         timeout-minutes: 45
         env:
           MARKET_FORCE: ${{ inputs.market == true }}
           RAKUTEN_APP_ID: ${{ secrets.RAKUTEN_APP_ID }}
+          RAKUTEN_ACCESS_KEY: ${{ secrets.RAKUTEN_ACCESS_KEY }}
+          RAKUTEN_AFFILIATE_ID: ${{ secrets.RAKUTEN_AFFILIATE_ID }}
           YAHOO_CLIENT_ID: ${{ secrets.YAHOO_CLIENT_ID }}
         run: node scripts/marketplace-data-check.mjs && node scripts/build-marketplaces.mjs --dir _site/market
       - name: Keep the last marketplace file if the build failed

@@ -1,6 +1,7 @@
 // Checks scripts/marketplace-data.mjs under Node, with answers shaped as
-// Rakuten's and Yahoo!'s documentation gives them (not yet seen live:
-// the keys were not in hand on 2026-10-10):
+// Rakuten's (Ichiba Item Search 2026-07-01, both format versions, and the
+// old capitalised shape) and Yahoo!'s documentation give them; not yet
+// seen live (the keys came on 2026-10-10, after the reader was written):
 //   node scripts/marketplace-data-check.mjs
 import assert from 'node:assert/strict';
 
@@ -75,6 +76,13 @@ check("the services' answers as offers, and the cheapest in stock that fits", ()
   });
   assert.equal(rakuten.length, 4);
   assert.deepEqual(pickOffer(ja, rakuten), { price: 16500, url: 'https://item.rakuten.co.jp/d/1/', title: 'MTG ファウンデーションズ プレイ・ブースター BOX 日本語版', seller: 'D', stock: true });
+  const flat = rakutenOffers({
+    count: 1,
+    items: [{ itemName: 'MTG ファウンデーションズ プレイ・ブースター BOX 日本語版', itemPrice: 16000, itemUrl: 'https://item.rakuten.co.jp/e/1/', affiliateUrl: 'https://hb.afl.rakuten.co.jp/hgc/x/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fe%2F1%2F', availability: 1, shopName: 'E' }],
+  });
+  assert.deepEqual(flat, [{ price: 16000, url: 'https://hb.afl.rakuten.co.jp/hgc/x/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fe%2F1%2F', title: 'MTG ファウンデーションズ プレイ・ブースター BOX 日本語版', seller: 'E', stock: true }], '2026-07-01 with formatVersion 2: a flat lowercase items array, the affiliate link when there is one');
+  const wrapped = rakutenOffers({ items: [{ item: { itemName: 'x', itemPrice: 100, itemUrl: 'https://item.rakuten.co.jp/f/1/', availability: 0, shopName: 'F' } }] });
+  assert.deepEqual(wrapped, [{ price: 100, url: 'https://item.rakuten.co.jp/f/1/', title: 'x', seller: 'F', stock: false }], 'formatVersion 1: each in a lowercase item wrapper, the plain link without an affiliate id');
   const yahoo = yahooOffers({
     hits: [
       { name: 'ファウンデーションズ プレイブースター BOX 日本語版 36パック', price: 16200, url: 'https://store.shopping.yahoo.co.jp/x/1.html', inStock: true, seller: { name: 'X' } },
