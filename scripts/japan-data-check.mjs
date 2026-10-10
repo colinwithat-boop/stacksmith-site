@@ -36,10 +36,10 @@ check('the cards merge: the cheapest in stock per cell across shops, else the ch
     },
   });
   const by = Object.fromEntries(rows.map((r) => [r[0], r]));
-  assert.deepEqual(by.a, ['a', 500, 800, null, 450, null, null, 11, 'hareruya', 0b000011], 'in stock beats cheaper sold out; en the cheaper of two sold out; the shop of the cheapest in-stock cell');
-  assert.deepEqual(by.b, ['b', 300, null, null, null, null, null, 12, 'hareruya', 0b000001]);
-  assert.deepEqual(by.c, ['c', 200, null, null, null, null, null, 23, 'bigweb', 0], 'one shop, sold out: kept, marked');
-  assert.deepEqual(by.d, ['d', 1000, null, null, null, null, null, 14, 'hareruya', 0b000001], "the old file's row counts as in stock and wins over a cheaper sold-out one");
+  assert.deepEqual(by.a, ['a', 500, 800, null, 450, null, null, 11, 'hareruya', 0b000011, null, null, null, null, null], 'in stock beats cheaper sold out; en the cheaper of two sold out; the shop of the cheapest in-stock cell');
+  assert.deepEqual(by.b, ['b', 300, null, null, null, null, null, 12, 'hareruya', 0b000001, null, null, null, null, null]);
+  assert.deepEqual(by.c, ['c', 200, null, null, null, null, null, 23, 'bigweb', 0, null, null, null, null, null], 'one shop, sold out: kept, marked');
+  assert.deepEqual(by.d, ['d', 1000, null, null, null, null, null, 14, 'hareruya', 0b000001, null, null, null, null, null], "the old file's row counts as in stock and wins over a cheaper sold-out one");
   assert.deepEqual(rows.map((r) => r[0]), ['a', 'b', 'c', 'd'], 'sorted by id');
   assert.deepEqual(mergeCardRows({ hareruya: null, bigweb: { rows: [] } }), []);
   // The day's dollars and euros beside the yen, when the daily file is given.
