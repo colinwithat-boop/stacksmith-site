@@ -8,7 +8,10 @@
 //                  changes, keep}. The ONLY file that changes in place.
 //   full-<slug>.json        every paper printing with a price, one row
 //                  each: [scryfall id, usd, usd_foil, usd_etched, eur,
-//                  eur_foil, tcgplayer id, tcgplayer etched id].
+//                  eur_foil, tcgplayer id, tcgplayer etched id, eur_low,
+//                  eur_foil_low, eur_avg, eur_foil_avg] (the last four
+//                  Cardmarket's cheapest listing and 30-day average, since
+//                  2026-10-09; a reader from before ignores them).
 //   changes-<from>-<to>.json  the rows that differ from the previous
 //                  version's full file: a changed or new printing's whole
 //                  row, and [scryfall id] alone for one that has no price

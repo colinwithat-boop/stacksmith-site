@@ -41,6 +41,10 @@ on:
         description: "Build a new price version (as the morning run does). Off: publish the live price files again."
         type: boolean
         default: false
+      hareruya:
+        description: "Read Hareruya again even when the live hareruya/ files are under 20 hours old."
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -125,6 +129,28 @@ jobs:
             mkdir -p _site/sealed
             curl -fsSL "${SITE_URL}sealed/prices.json" -o _site/sealed/prices.json || rm -f _site/sealed/prices.json
             echo "::warning::The sealed prices build failed; the live file was republished."
+          fi
+      # What cards and sealed products sell for at Hareruya (晴れる屋), in
+      # yen, for the app's users in Japan (scripts/build-hareruya.mjs):
+      # read from Hareruya's product search, one request every 0.4 s and
+      # about 600 a run, only when the live hareruya/cards.json is over 20
+      # hours old (or the hareruya input is ticked); any other run
+      # publishes the live files again. Optional, as the sealed prices: a
+      # failure keeps the live files.
+      - name: Build the Hareruya price files
+        continue-on-error: true
+        timeout-minutes: 45
+        env:
+          HARERUYA_FORCE: ${{ inputs.hareruya == true }}
+        run: node scripts/hareruya-data-check.mjs && node scripts/build-hareruya.mjs --dir _site/hareruya
+      - name: Keep the last Hareruya files if the build failed
+        run: |
+          if [ ! -f _site/hareruya/cards.json ]; then
+            mkdir -p _site/hareruya
+            for f in cards.json sealed.json report.json; do
+              curl -fsSL "${SITE_URL}hareruya/$f" -o "_site/hareruya/$f" || rm -f "_site/hareruya/$f"
+            done
+            echo "::warning::The Hareruya build failed; the live files were republished."
           fi
       # The files on Cloudflare Pages (https://stacksmith-app.pages.dev/),
       # where the app reads them (static requests free and unmetered).

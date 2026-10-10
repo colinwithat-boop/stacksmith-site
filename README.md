@@ -57,9 +57,33 @@ morning).
   Japanese boosters, Renaissance's German ones) are left out: their cards
   are the set's own in that language, and the app has only English
   prices; a Secret Lair drop in Japanese stays (its own printings).
+- `hareruya/`: what cards and sealed products sell for at Hareruya
+  (晴れる屋, hareruyamtg.com, Japan's largest Magic retailer), in yen, for
+  the app's users in Japan. `cards.json` holds one row per Scryfall
+  printing Hareruya sells, `[scryfall id, ja, ja_foil, ja_etched, en,
+  en_foil, en_etched, product]`: the Japanese-language and the
+  English-language copies of the same printing, NM, the cheapest in
+  stock (else the cheapest listed), and the Hareruya product id, whose
+  page is `https://www.hareruyamtg.com/ja/products/detail/<product>`.
+  `sealed.json` holds the sealed products' prices by the app's product id
+  (the sealed set files' `id`), under `ja` and `en`, each `[price,
+  product]`. `report.json` says what did not match and why. Built by
+  `scripts/build-hareruya.mjs` from Hareruya's own product search (JSON,
+  one document per SKU, read set by set with one request every 0.4 s,
+  ~600 a run) and Scryfall's bulk data (the set code and collector number
+  in a product's name name the printing; the pure parsing and matching is
+  `scripts/hareruya-data.mjs`, checked by `scripts/hareruya-data-check.mjs`).
+  Hareruya is read once a day: the prices workflow builds only when the
+  live `cards.json` is over 20 hours old (or its `hareruya` input is
+  ticked) and republishes the live files otherwise. Never committed. By
+  hand, with every answer kept on disk for tuning the parser:
+  `HARERUYA_FORCE=true node scripts/build-hareruya.mjs --dir _site/hareruya --raw-dir /tmp/hareruya --no-live`.
 - `prices/`: the day's prices for every paper printing, built from
   Scryfall's bulk data by `scripts/build-prices.mjs` in the daily deploy and
-  never committed. `version.json` names the current version's full file and
+  never committed: TCGplayer Market in dollars and Cardmarket's trend in
+  euros from Scryfall, and (since 2026-10-09) Cardmarket's cheapest listing
+  and 30-day average from its public price guide, by the card's
+  cardmarket_id, for the app's Cardmarket Low and Average levels. `version.json` names the current version's full file and
   the change file from the version before (the rows that differ, about
   half the size), which is what a phone holding yesterday's prices
   downloads; `latest.json` is the full file again for older app builds.
