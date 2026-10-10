@@ -122,7 +122,11 @@ morning).
   ends `[..., product, shop, stock]`: the shop ("hareruya" or "bigweb")
   whose product id that is, the shop of the cheapest in-stock cell, and
   the in-stock bitmask (the shops' own files carry the same mask as their
-  ninth cell). Sealed cells are `[price, product, in stock, shop]`.
+  ninth cell), then `[usd, usd_foil, usd_etched, eur, eur_foil]`, the
+  day's TCGplayer Market dollars and Cardmarket trend euros from the daily
+  price file (so a phone on the Japan source prices its English and
+  European-language copies without that file). Sealed cells are
+  `[price, product, in stock, shop]`.
 - `prices/`: the day's prices for every paper printing, built from
   Scryfall's bulk data by `scripts/build-prices.mjs` in the daily deploy and
   never committed: TCGplayer Market in dollars and Cardmarket's trend in

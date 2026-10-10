@@ -2,7 +2,7 @@
 //   node scripts/japan-data-check.mjs
 import assert from 'node:assert/strict';
 
-import { japanCardsBody, japanSealedBody, mergeCardRows, mergeSealed, stockOf } from './japan-data.mjs';
+import { dailyPrices, japanCardsBody, japanSealedBody, mergeCardRows, mergeSealed, stockOf } from './japan-data.mjs';
 
 let passed = 0;
 const check = (name, fn) => {
@@ -42,6 +42,12 @@ check('the cards merge: the cheapest in stock per cell across shops, else the ch
   assert.deepEqual(by.d, ['d', 1000, null, null, null, null, null, 14, 'hareruya', 0b000001], "the old file's row counts as in stock and wins over a cheaper sold-out one");
   assert.deepEqual(rows.map((r) => r[0]), ['a', 'b', 'c', 'd'], 'sorted by id');
   assert.deepEqual(mergeCardRows({ hareruya: null, bigweb: { rows: [] } }), []);
+  // The day's dollars and euros beside the yen, when the daily file is given.
+  const daily = dailyPrices({ rows: [['a', '0.34', '0.54', null, '0.35', '0.49', 558404, null], ['zz', '1', null, null, null, null, null, null]] });
+  const withDay = mergeCardRows({ hareruya: { rows: [['a', 500, null, null, null, null, null, 11, 1], ['b', 300, null, null, null, null, null, 12, 1]] } }, daily);
+  assert.deepEqual(withDay[0].slice(10), ['0.34', '0.54', null, '0.35', '0.49'], "the file's columns 1 to 5");
+  assert.deepEqual(withDay[1].slice(10), [null, null, null, null, null], 'a printing the file lacks');
+  assert.equal(withDay[0].length, 15);
 });
 
 check('the sealed merge: per product and language, in stock first, then price, with the shop', () => {

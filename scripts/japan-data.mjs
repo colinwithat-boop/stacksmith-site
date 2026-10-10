@@ -12,9 +12,15 @@
 // (bit 0 ja, 1 ja_foil, 2 ja_etched, 3 en, 4 en_foil, 5 en_etched); a row
 // without it (a file from before) counts every priced cell as in stock.
 // The merged file's rows are
-//   [scryfall id, ja, ja_foil, ja_etched, en, en_foil, en_etched, product, shop, stock]
+//   [scryfall id, ja, ja_foil, ja_etched, en, en_foil, en_etched, product, shop, stock,
+//    usd, usd_foil, usd_etched, eur, eur_foil]
 // with `shop` the name of the shop whose `product` it is ("hareruya" or
-// "bigweb"): the shop of the cheapest in-stock cell, else of the cheapest.
+// "bigweb"): the shop of the cheapest in-stock cell, else of the cheapest;
+// and (since 2026-10-10) the day's TCGplayer Market dollars and Cardmarket
+// trend euros from the daily price file, so a phone on the Japan source
+// prices its English copies' dollars and its European-language copies'
+// euros without the daily file (the owner: a copy priced where its
+// language is sold).
 // A shop's sealed file has cells [price, product, in stock] under `ja` and
 // `en`; the merged one [price, product, in stock, shop].
 
@@ -35,7 +41,7 @@ export function stockOf(row) {
  * across the shops, else the cheapest listed; the row's shop and product
  * are the cheapest in-stock cell's shop, else the cheapest cell's.
  */
-export function mergeCardRows(files) {
+export function mergeCardRows(files, daily = null) {
   const byId = new Map();
   for (const [shop, file] of Object.entries(files)) {
     if (!file || !Array.isArray(file.rows)) continue;
@@ -68,9 +74,26 @@ export function mergeCardRows(files) {
       if (!best || (c.stock && !best.stock) || (c.stock === best.stock && c.price < best.price)) best = c;
     }
     if (!best) continue;
-    rows.push([id, ...cells.map((c) => (c ? c.price : null)), best.product, best.shop, mask]);
+    const day = daily ? daily.get(id) : null;
+    rows.push([id, ...cells.map((c) => (c ? c.price : null)), best.product, best.shop, mask, ...(day ?? [null, null, null, null, null])]);
   }
   return rows.sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
+}
+
+/**
+ * The daily price file's dollars and euros by printing: a map of the
+ * Scryfall id to [usd, usd_foil, usd_etched, eur, eur_foil] (the file's
+ * columns 1 to 5, text or null), for the merged rows.
+ */
+export function dailyPrices(file) {
+  const out = new Map();
+  if (!file || !Array.isArray(file.rows)) return out;
+  for (const r of file.rows) {
+    if (!Array.isArray(r) || typeof r[0] !== 'string') continue;
+    const cell = (v) => (typeof v === 'string' && v !== '' ? v : typeof v === 'number' ? String(v) : null);
+    out.set(r[0], [cell(r[1]), cell(r[2]), cell(r[3]), cell(r[4]), cell(r[5])]);
+  }
+  return out;
 }
 
 /**

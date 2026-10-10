@@ -10,7 +10,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { japanCardsBody, japanSealedBody, mergeCardRows, mergeSealed } from './japan-data.mjs';
+import { dailyPrices, japanCardsBody, japanSealedBody, mergeCardRows, mergeSealed } from './japan-data.mjs';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const args = process.argv.slice(2);
@@ -51,7 +51,18 @@ if (Object.keys(cards).length === 0) {
   console.error('::error::no shop file to merge: japan/ is left as it is');
   process.exit(1);
 }
-const rows = mergeCardRows(cards);
+// The day's price file (republished or built into _site/prices by the run):
+// its dollars and euros ride on the merged rows.
+let daily = null;
+try {
+  const version = JSON.parse(fs.readFileSync(path.join(SITE, 'prices', 'version.json'), 'utf8'));
+  const full = typeof version.full === 'string' ? version.full : null;
+  if (full) daily = dailyPrices(JSON.parse(fs.readFileSync(path.join(SITE, 'prices', full), 'utf8')));
+  console.log(`daily prices: ${daily ? daily.size : 0} printings from ${full}`);
+} catch (e) {
+  console.warn(`::warning::the daily price file could not be read for the Japan merge (${e instanceof Error ? e.message : e}): no dollars or euros on its rows`);
+}
+const rows = mergeCardRows(cards, daily);
 const merged = mergeSealed(sealed);
 const built = new Date().toISOString();
 // The newest shop read: the app dates the file by it.
