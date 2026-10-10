@@ -34,6 +34,8 @@ check('the search: set, kind, unit and language; what is not asked for', () => {
   assert.equal(marketplaceQuery(gift, 'ファウンデーションズ', 'ja').text, 'MTG ファウンデーションズ ギフトバンドル 日本語版');
   assert.equal(marketplaceQuery(deck, 'ファウンデーションズ', 'ja'), null, 'decks and kits are not asked for');
   assert.equal(marketplaceQuery(sample, 'ファウンデーションズ', 'ja'), null, 'nor samples');
+  const masterCase = { id: 'm1', name: 'Foundations Collector Booster Box Master Case', short: 'Collector Booster Box Master Case', cat: 'booster_box', sub: 'collector', parts: [['s', 'case-id', 4]] };
+  assert.equal(marketplaceQuery(masterCase, 'ファウンデーションズ', 'ja'), null, 'nor a case filed as a box: its search would be the box\'s');
   assert.equal(marketplaceQuery(box, '', 'ja'), null, 'no Japanese set name, no search');
   assert.equal(marketplaceQuery(box, 'ファウンデーションズ', 'fr'), null);
 });

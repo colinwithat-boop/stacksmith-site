@@ -39,8 +39,12 @@ export function marketplaceQuery(product, setNameJa, language) {
   } else if (cat === 'bundle') {
     kind = { booster: null, unit: 'bundle', words: sub === 'gift_bundle' ? 'ギフトバンドル' : 'バンドル' };
   } else return null;
-  // Samples, promo packs and the like are not shelf products here.
-  if (/\b(Sample|Promo|Topper|Prerelease|Minimal Packaging)\b/i.test(product.name ?? '')) return null;
+  // Samples, promo packs and the like are not shelf products here; nor is a
+  // case, even one the set files file as a box ("Collector Booster Box
+  // Master Case", cat booster_box, parts of cases rather than packs): its
+  // search would be the box's and bring the box's price (seen live,
+  // 2026-10-10, Secrets of Strixhaven at 66,000 yen).
+  if (/\b(Sample|Promo|Topper|Prerelease|Minimal Packaging|Case)\b/i.test(product.name ?? '')) return null;
   const packs = packsOf(product);
   return {
     text: `MTG ${setNameJa} ${kind.words} ${LANGUAGE_WORDS[language]}`,
