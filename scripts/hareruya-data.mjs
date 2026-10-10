@@ -371,8 +371,8 @@ export function cardRows(cells) {
 }
 
 /** The cards file's text: one row per line. */
-export function cardsBody({ built, scraped, rows, counts }) {
-  return `{"v":${FORMAT},"source":"hareruya","currency":"JPY","built":"${built}","scraped":"${scraped}","counts":${JSON.stringify(counts)},"count":${rows.length},"rows":[\n${rows.map((r) => JSON.stringify(r)).join(',\n')}\n]}\n`;
+export function cardsBody({ built, scraped, rows, counts, source = 'hareruya' }) {
+  return `{"v":${FORMAT},"source":"${source}","currency":"JPY","built":"${built}","scraped":"${scraped}","counts":${JSON.stringify(counts)},"count":${rows.length},"rows":[\n${rows.map((r) => JSON.stringify(r)).join(',\n')}\n]}\n`;
 }
 
 // ---- Sealed products
@@ -564,7 +564,7 @@ export function matchSealed(parsed, products, language = 'en') {
 }
 
 /** The sealed file's text: prices by the app's product id, per language. */
-export function sealedBody({ built, scraped, ja, en, counts }) {
+export function sealedBody({ built, scraped, ja, en, counts, source = 'hareruya' }) {
   const sorted = (o) => Object.fromEntries(Object.keys(o).sort().map((k) => [k, o[k]]));
-  return `{"v":${FORMAT},"source":"hareruya","currency":"JPY","built":"${built}","scraped":"${scraped}","counts":${JSON.stringify(counts)},"ja":${JSON.stringify(sorted(ja))},"en":${JSON.stringify(sorted(en))}}\n`;
+  return `{"v":${FORMAT},"source":"${source}","currency":"JPY","built":"${built}","scraped":"${scraped}","counts":${JSON.stringify(counts)},"ja":${JSON.stringify(sorted(ja))},"en":${JSON.stringify(sorted(en))}}\n`;
 }

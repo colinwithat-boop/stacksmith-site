@@ -79,6 +79,21 @@ morning).
   ticked) and republishes the live files otherwise. Never committed. By
   hand, with every answer kept on disk for tuning the parser:
   `HARERUYA_FORCE=true node scripts/build-hareruya.mjs --dir _site/hareruya --raw-dir /tmp/hareruya --no-live`.
+- `bigweb/`: the same three files for Bigweb (BIG MAGIC, bigweb.co.jp),
+  the second Japanese shop (2026-10-10), shaped exactly as `hareruya/`'s
+  with `"source": "bigweb"`; a card's page is
+  `https://www.bigweb.co.jp/ja/products/mtg/<product>`. Built by
+  `scripts/build-bigweb.mjs` from Bigweb's own product API
+  (api.bigweb.co.jp, JSON, 100 listings a page: the set list once, every
+  set whose code names a Scryfall set page by page, the sealed goods
+  whole; one request every 0.4 s, ~2,800 a run). A variant printing's
+  listing carries its collector number ("(363"), a plain one matches by
+  name within the set, a double-sided token by both names; the parsing
+  and matching is `scripts/bigweb-data.mjs`, checked by
+  `scripts/bigweb-data-check.mjs`. Sealed: boosters and bundles by kind,
+  decks and kits only when the name has Latin words. Read once a day on
+  the same rule as Hareruya (its `bigweb` input forces a read). By hand:
+  `BIGWEB_FORCE=true node scripts/build-bigweb.mjs --dir _site/bigweb --raw-dir /tmp/bigweb --no-live [--max-sets 6]`.
 - `prices/`: the day's prices for every paper printing, built from
   Scryfall's bulk data by `scripts/build-prices.mjs` in the daily deploy and
   never committed: TCGplayer Market in dollars and Cardmarket's trend in
