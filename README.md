@@ -23,7 +23,7 @@ morning).
   MTGJSON's SLD.json (the drop names, MIT); never committed. Grouping and
   shape: `scripts/home-data.mjs`, checked by `scripts/home-data-check.mjs`.
   Nothing is read from Wizards' Secret Lair store; the app only links to it.
-- `sealed/`: what is inside sealed products, for the app's Packs tab:
+- `sealed/`: what is inside sealed products, for the app's Sealed tab (formerly Packs):
   `index.json` (every set with a product the app can value, newest first,
   each with its products' short names, kinds, dates and TCGplayer ids, for
   the app's search over every set and its older products, by their place in
