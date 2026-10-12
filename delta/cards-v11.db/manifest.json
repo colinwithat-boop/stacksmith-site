@@ -2,14 +2,6 @@
  "v": 1,
  "db": "cards-v11.db",
  "sets": {
-  "mdc": {
-   "count": 1,
-   "bundleCount": 0,
-   "scryfallCount": 1,
-   "cards": "mdc.json",
-   "sigs": "mdc.bin",
-   "records": 1
-  },
   "mdd": {
    "count": 12,
    "bundleCount": 0,
@@ -17,6 +9,14 @@
    "cards": "mdd.json",
    "sigs": "mdd.bin",
    "records": 13
+  },
+  "mdc": {
+   "count": 1,
+   "bundleCount": 0,
+   "scryfallCount": 1,
+   "cards": "mdc.json",
+   "sigs": "mdc.bin",
+   "records": 1
   },
   "pfra": {
    "count": 90,
