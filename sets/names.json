@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-02",
+  "updated": "2026-10-12",
   "sets": {
     "ecl": {
       "en": "Lorwyn Eclipsed",
@@ -23,6 +23,14 @@
       "fr": "Le Hobbit",
       "es": "El Hobbit",
       "it": "Lo Hobbit"
+    },
+    "nau": {
+      "en": "Nauctis: The Sunken Realm",
+      "ja": "ノークティス：深淵の水府",
+      "de": "Nauctis: Das versunkene Reich",
+      "fr": "Nauctis : le royaume des profondeurs",
+      "es": "Nauctis: el reino sumergido",
+      "it": "Nauctis: Il Regno Sommerso"
     },
     "sos": {
       "en": "Secrets of Strixhaven",
