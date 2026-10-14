@@ -2,14 +2,6 @@
  "v": 1,
  "db": "cards-v11.db",
  "sets": {
-  "mdd": {
-   "count": 12,
-   "bundleCount": 0,
-   "scryfallCount": 12,
-   "cards": "mdd.json",
-   "sigs": "mdd.bin",
-   "records": 13
-  },
   "mdc": {
    "count": 1,
    "bundleCount": 0,
@@ -17,6 +9,14 @@
    "cards": "mdc.json",
    "sigs": "mdc.bin",
    "records": 1
+  },
+  "mdd": {
+   "count": 12,
+   "bundleCount": 0,
+   "scryfallCount": 12,
+   "cards": "mdd.json",
+   "sigs": "mdd.bin",
+   "records": 13
   },
   "pfra": {
    "count": 90,
@@ -50,13 +50,21 @@
    "sigs": "slp.bin",
    "records": 3
   },
+  "plst": {
+   "count": 77,
+   "bundleCount": 5663,
+   "scryfallCount": 5740,
+   "cards": "plst.json",
+   "sigs": "plst.bin",
+   "records": 77
+  },
   "sld": {
-   "count": 14,
+   "count": 23,
    "bundleCount": 2820,
-   "scryfallCount": 2834,
+   "scryfallCount": 2843,
    "cards": "sld.json",
    "sigs": "sld.bin",
-   "records": 15
+   "records": 24
   },
   "pmei": {
    "count": 1,
