@@ -1,0 +1,14 @@
+{
+ "v": 1,
+ "db": "cards-v13.db",
+ "sets": {
+  "pmei": {
+   "count": 3,
+   "bundleCount": 113,
+   "scryfallCount": 116,
+   "cards": "pmei.json",
+   "sigs": "pmei.bin",
+   "records": 3
+  }
+ }
+}
