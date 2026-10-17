@@ -2,6 +2,14 @@
  "v": 1,
  "db": "cards-v13.db",
  "sets": {
+  "slc": {
+   "count": 30,
+   "bundleCount": 84,
+   "scryfallCount": 114,
+   "cards": "slc.json",
+   "sigs": "slc.bin",
+   "records": 30
+  },
   "pmei": {
    "count": 3,
    "bundleCount": 113,
