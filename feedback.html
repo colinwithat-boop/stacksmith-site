@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stacksmith ご意見と不具合の報告</title>
+<meta name="description" content="Stacksmith の不具合の報告や機能のご要望はこちらから。日本語のまま送れます。">
+<style>
+  :root { color-scheme: light dark; }
+  body { margin: 0; padding: 32px 16px 64px; font: 16px/1.7 system-ui, -apple-system, "Segoe UI", Roboto, "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif; background: #f6f7f9; color: #10141b; }
+  main { max-width: 560px; margin: 0 auto; }
+  h1 { font-size: 24px; margin: 0 0 6px; }
+  p { margin: 0 0 10px; }
+  a { color: #2b6cb0; }
+  .lead { color: #5b6472; margin-bottom: 28px; }
+  [hidden] { display: none !important; }
+  form { display: grid; gap: 18px; }
+  label, fieldset { display: grid; gap: 6px; margin: 0; padding: 0; border: 0; min-width: 0; }
+  legend, .label { font-weight: 600; padding: 0; }
+  .hint { color: #5b6472; font-size: 14px; }
+  input, select, textarea, button { font: inherit; }
+  input, select, textarea { width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1px solid #c9cfd8; border-radius: 8px; background: #fff; color: inherit; }
+  textarea { min-height: 160px; resize: vertical; }
+  input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid #2b6cb0; outline-offset: 1px; }
+  .segments { display: flex; gap: 0; }
+  .segments label { flex: 1; display: block; text-align: center; padding: 9px 4px; border: 1px solid #c9cfd8; background: #fff; cursor: pointer; }
+  .segments label:first-child { border-radius: 8px 0 0 8px; }
+  .segments label:last-child { border-radius: 0 8px 8px 0; }
+  .segments label + label { margin-left: -1px; }
+  .segments input { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .segments input:checked + span { font-weight: 600; }
+  .segments label:has(input:checked) { background: #2b6cb0; border-color: #2b6cb0; color: #fff; z-index: 1; }
+  .segments label:has(input:focus-visible) { outline: 2px solid #2b6cb0; outline-offset: 1px; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 420px) { .two { grid-template-columns: 1fr; } }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+  button { padding: 12px 20px; border: 0; border-radius: 8px; background: #2b6cb0; color: #fff; font-weight: 600; cursor: pointer; }
+  button[disabled] { opacity: 0.6; cursor: default; }
+  .status { min-height: 1.5em; }
+  .status.error { color: #b42318; }
+  .done { padding: 20px; border: 1px solid #c9cfd8; border-radius: 8px; background: #fff; }
+  .done h2 { font-size: 18px; margin: 0 0 6px; }
+  .note { margin-top: 28px; color: #5b6472; font-size: 14px; }
+  .legal { margin-top: 40px; padding-top: 16px; border-top: 1px solid #dfe3ea; color: #5b6472; font-size: 13px; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #0f1115; color: #e9edf3; }
+    a { color: #7fb4ee; }
+    .lead, .hint, .note, .legal { color: #98a1b0; }
+    .legal { border-top-color: #282d36; }
+    input, select, textarea, .segments label, .done { background: #181b21; border-color: #343a45; }
+    .segments label:has(input:checked) { background: #3b82f6; border-color: #3b82f6; color: #fff; }
+    .status.error { color: #f97066; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Stacksmith へのご意見</h1>
+  <p class="lead">不具合の報告や機能のご要望はこちらからどうぞ。日本語のまま送れます。開発者には英語訳を添えて届きます。</p>
+
+  <form id="form" novalidate>
+    <fieldset>
+      <legend>種類</legend>
+      <div class="segments" role="radiogroup">
+        <label><input type="radio" name="type" value="bug" checked><span>不具合</span></label>
+        <label><input type="radio" name="type" value="idea"><span>機能の要望</span></label>
+        <label><input type="radio" name="type" value="other"><span>その他</span></label>
+      </div>
+    </fieldset>
+
+    <label>
+      <span class="label">画面</span>
+      <select id="screen" name="screen">
+        <option value="">選んでください</option>
+        <option value="home">ホーム</option>
+        <option value="scan">スキャン</option>
+        <option value="inventory">コレクション</option>
+        <option value="decks">マイデッキ</option>
+        <option value="search">デッキ検索</option>
+        <option value="sealed">未開封</option>
+        <option value="play">プレイ（ライフカウンター）</option>
+        <option value="settings">設定</option>
+        <option value="other">その他</option>
+      </select>
+    </label>
+
+    <label>
+      <span class="label">内容</span>
+      <textarea id="text" name="text" maxlength="3000" required placeholder="何が起きたか、どうなってほしいかを書いてください。カード名や操作の手順があると助かります。"></textarea>
+      <span class="hint">3000文字まで</span>
+    </label>
+
+    <div class="two" id="bugFields">
+      <label>
+        <span class="label">端末とOS（任意）</span>
+        <input id="device" name="device" maxlength="200" placeholder="例: Pixel 8, Android 15" autocomplete="off">
+      </label>
+      <label>
+        <span class="label">アプリのバージョン（任意）</span>
+        <input id="version" name="version" maxlength="200" placeholder="例: 2.0" autocomplete="off">
+        <span class="hint">設定 &gt; アプリについて に表示されます。</span>
+      </label>
+    </div>
+
+    <label>
+      <span class="label">メールアドレス（任意）</span>
+      <input id="email" name="email" type="email" inputmode="email" autocomplete="email" maxlength="200" placeholder="example@example.com">
+      <span class="hint">返信や確認の質問を受け取ってもよい場合に入力してください。</span>
+    </label>
+
+    <label class="hp" aria-hidden="true">
+      <span>このままにしてください</span>
+      <input name="website" tabindex="-1" autocomplete="off">
+    </label>
+
+    <div>
+      <button id="send" type="submit">送信</button>
+    </div>
+    <p id="status" class="status" role="status" aria-live="polite"></p>
+  </form>
+
+  <div id="done" class="done" hidden>
+    <h2>送信しました。ありがとうございます。</h2>
+    <p>内容は開発者に届きました。返信が必要な場合は、書いていただいたメールアドレスにご連絡します。</p>
+    <p><a href="#" id="again">もう一件送る</a></p>
+  </div>
+
+  <p class="note">送信した内容とメールアドレス、お使いのブラウザの種類は、開発者へのメールにだけ使います。英語訳は AI (Claude) が作ります。<a href="privacy.html">プライバシーポリシー</a>（英語）</p>
+
+  <p class="legal">Magic: The Gathering は Wizards of the Coast の著作物です。Stacksmith は Wizards of the Coast が製作、承認、支援するものではなく、提携もしていません。</p>
+</main>
+
+<script>
+// Posts to the Cloudflare copy of the site by its full address, because the
+// same page is also served from GitHub Pages, which has no /api/.
+var API = 'https://stacksmith-app.pages.dev/api/feedback';
+var form = document.getElementById('form');
+// Not named "status": a top-level var of that name is window.status, a string.
+var statusLine = document.getElementById('status');
+var send = document.getElementById('send');
+var done = document.getElementById('done');
+
+function setStatus(message, error) {
+  statusLine.textContent = message;
+  statusLine.className = 'status' + (error ? ' error' : '');
+}
+
+function chosenType() {
+  return (form.querySelector('input[name="type"]:checked') || {}).value || 'other';
+}
+
+// The phone, OS and app version only help with a bug, so the other types
+// do not ask for them (the owner, 2026-10-21).
+var bugFields = document.getElementById('bugFields');
+function showBugFields() {
+  bugFields.hidden = chosenType() !== 'bug';
+}
+form.addEventListener('change', function (e) {
+  if (e.target.name === 'type') showBugFields();
+});
+showBugFields();
+
+form.addEventListener('submit', function (e) {
+  e.preventDefault();
+  var text = document.getElementById('text').value.trim();
+  if (!text) {
+    setStatus('内容を入力してください。', true);
+    document.getElementById('text').focus();
+    return;
+  }
+  var isBug = chosenType() === 'bug';
+  var body = {
+    type: chosenType(),
+    screen: document.getElementById('screen').value,
+    text: text,
+    device: isBug ? document.getElementById('device').value.trim() : '',
+    version: isBug ? document.getElementById('version').value.trim() : '',
+    email: document.getElementById('email').value.trim(),
+    website: form.elements.website.value
+  };
+  send.disabled = true;
+  setStatus('送信しています。', false);
+  fetch(API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  }).then(function (res) {
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return res.json();
+  }).then(function (data) {
+    if (!data || !data.ok) throw new Error('not ok');
+    form.hidden = true;
+    done.hidden = false;
+    setStatus('', false);
+    done.querySelector('h2').setAttribute('tabindex', '-1');
+    done.querySelector('h2').focus();
+  }).catch(function () {
+    setStatus('送信できませんでした。しばらくしてからもう一度お試しください。', true);
+  }).then(function () {
+    send.disabled = false;
+  });
+});
+
+document.getElementById('again').addEventListener('click', function (e) {
+  e.preventDefault();
+  form.reset();
+  showBugFields();
+  done.hidden = true;
+  form.hidden = false;
+  document.getElementById('text').focus();
+});
+</script>
+</body>
+</html>

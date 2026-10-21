@@ -12,6 +12,22 @@ morning).
 - `privacy.html`, `support.html`, `index.html`: the app's privacy policy and
   support pages (the policy's source copy lives in the app repo under
   `store/`; copy it here after a change).
+- `feedback.html` (served at /feedback): the Japanese feedback page, for
+  bug reports and feature requests from users in Japan. It posts to
+  `functions/api/feedback.js`, a Cloudflare Pages Function (`wrangler pages
+  deploy` compiles the `functions/` folder beside `_site`; GitHub Pages has
+  no copy of it, so the page posts to the Cloudflare address), which
+  translates the message between Japanese and English with Claude
+  (`claude-opus-5-5`, the original kept as written) and emails both to the
+  owner through Resend. Needs secrets on the Pages project (Settings >
+  Variables and Secrets, Production): `FEEDBACK_TO`, `RESEND_API_KEY`,
+  `ANTHROPIC_API_KEY` (optional: without it the email carries the original
+  only), `FEEDBACK_FROM` (optional). Without a verified domain Resend
+  delivers mail from onboarding@resend.dev only to the Resend account's own
+  address. A honeypot field and hard caps on every field stand in for a
+  CAPTCHA; add Cloudflare Turnstile if spam appears. Try it locally with
+  `npx wrangler@4 pages dev _site` after copying the pages into `_site`
+  (no secrets: the function answers 503 `not_configured`).
 - `packs/`: the card-language packs (names and rules text per language).
 - `sets/names.json`: localized set names for the app's Home tab, refreshed
   every Monday by `.github/workflows/set-names.yml` from Wizards' product pages.
