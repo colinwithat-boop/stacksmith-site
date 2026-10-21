@@ -1,0 +1,182 @@
+# A fast publish of the site, for when a page has to go live now: the same
+# steps as prices.yml, without the three shop reads (Hareruya, Bigweb, the
+# marketplaces), which can take half an hour. Their live files are published
+# again unchanged by the 'Keep the last ... files' steps (their 'build
+# failed' warning is expected here). Publishes to Cloudflare Pages only, the
+# address the app and the /get/ link use; GitHub Pages catches up at
+# prices.yml's next run. Its own queue, so it never waits behind prices.yml
+# (whichever finishes last is live; both publish the same data). Runs once
+# when this file is pushed, otherwise only by hand from the Actions tab.
+name: Publish site now (shop prices kept)
+
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/publish-now.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-now
+  cancel-in-progress: true
+
+env:
+  SITE_URL: https://stacksmith-app.pages.dev/
+  PRICE_SLOT_UTC: '10:20'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Copy the site
+        run: |
+          mkdir -p _site
+          cp index.html privacy.html support.html 404.html _site/
+          cp -r packs sets delta sealed get _site/
+      - name: Check the price file layout
+        run: node scripts/price-changes-check.mjs
+      # Only the morning run (or one started by hand with new_version) makes
+      # a new price version; any other publishes the live one again
+      # (scripts/build-prices.mjs).
+      - name: Build the price files from Scryfall's bulk data
+        env:
+          NEW_VERSION: false
+        run: node scripts/build-prices.mjs --dir _site/prices
+      # The card facts (legality, colour identity, Game Changer) for the app's
+      # weekly check. Optional: a failure here must not hold back the prices.
+      - name: Build the card facts file from Scryfall's bulk data
+        continue-on-error: true
+        run: node scripts/build-facts.mjs --out _site/facts/latest.json
+      # A failed facts build keeps the file the site already serves (the live
+      # site is still the previous deploy here), rather than dropping it.
+      - name: Keep the last facts file if the build failed
+        run: |
+          if [ ! -f _site/facts/latest.json ]; then
+            mkdir -p _site/facts
+            curl -fsSL "${SITE_URL}facts/latest.json" -o _site/facts/latest.json || rm -f _site/facts/latest.json
+            echo "::warning::The facts build failed; the live file was republished."
+          fi
+      # What the app's Home tab shows under "Coming up": the next sets with
+      # their names in the app's languages, and the Secret Lair drops
+      # (scripts/build-home.mjs). Optional, as the facts: the app falls back
+      # to Scryfall's set list when it cannot have the file. Its grouping
+      # check runs first, in the same step, so a failing check skips only
+      # this build and the live file is republished.
+      - name: Build the Home file
+        continue-on-error: true
+        run: node scripts/home-data-check.mjs && node scripts/build-home.mjs --out _site/home/latest.json
+      - name: Keep the last Home file if the build failed
+        run: |
+          if [ ! -f _site/home/latest.json ]; then
+            mkdir -p _site/home
+            curl -fsSL "${SITE_URL}home/latest.json" -o _site/home/latest.json || rm -f _site/home/latest.json
+            echo "::warning::The Home build failed; the live file was republished."
+          fi
+      # What sealed products sell for on TCGplayer, beside the value of the
+      # cards inside (the Packs tab). Optional, as the facts: the app shows
+      # no online price without it. tcgcsv is asked only when it has
+      # published since the live file (scripts/build-sealed-prices.mjs).
+      - name: Build the sealed prices file
+        continue-on-error: true
+        run: node scripts/build-sealed-prices.mjs --out _site/sealed/prices.json
+      - name: Keep the last sealed prices file if the build failed
+        run: |
+          if [ ! -f _site/sealed/prices.json ]; then
+            mkdir -p _site/sealed
+            curl -fsSL "${SITE_URL}sealed/prices.json" -o _site/sealed/prices.json || rm -f _site/sealed/prices.json
+            echo "::warning::The sealed prices build failed; the live file was republished."
+          fi
+      # What cards and sealed products sell for at Hareruya (晴れる屋), in
+      # yen, for the app's users in Japan (scripts/build-hareruya.mjs):
+      # read from Hareruya's product search, one request every 0.4 s and
+      # about 600 a run, only when the live hareruya/cards.json is over 20
+      # hours old (or the hareruya input is ticked); any other run
+      # publishes the live files again. Optional, as the sealed prices: a
+      # failure keeps the live files.
+      - name: Keep the last Hareruya files if the build failed
+        run: |
+          if [ ! -f _site/hareruya/cards.json ]; then
+            mkdir -p _site/hareruya
+            for f in cards.json sealed.json report.json; do
+              curl -fsSL "${SITE_URL}hareruya/$f" -o "_site/hareruya/$f" || rm -f "_site/hareruya/$f"
+            done
+            echo "::warning::The Hareruya build failed; the live files were republished."
+          fi
+      # The same at Bigweb (BIG MAGIC), the second Japanese shop (the owner,
+      # 2026-10-10; scripts/build-bigweb.mjs): its product API, one request
+      # every 0.4 s and about 2,800 a run (~20 minutes), only when the live
+      # bigweb/cards.json is over 20 hours old (or the bigweb input is
+      # ticked). Its own step and timeout, so a slow Bigweb never costs the
+      # Hareruya files, and the same keep step.
+      - name: Keep the last Bigweb files if the build failed
+        run: |
+          if [ ! -f _site/bigweb/cards.json ]; then
+            mkdir -p _site/bigweb
+            for f in cards.json sealed.json report.json; do
+              curl -fsSL "${SITE_URL}bigweb/$f" -o "_site/bigweb/$f" || rm -f "_site/bigweb/$f"
+            done
+            echo "::warning::The Bigweb build failed; the live files were republished."
+          fi
+      # The marketplaces' sealed prices (the owner, 2026-10-10: Rakuten and
+      # Yahoo! Shopping for sealed only; scripts/build-marketplaces.mjs):
+      # each current booster, box and bundle searched for through the two
+      # official item-search APIs, Rakuten at most every 1.5 s and Yahoo
+      # every second, only when the live market/sealed.json is over 20
+      # hours old (or the market input is ticked). Needs the repository
+      # secrets: RAKUTEN_APP_ID and RAKUTEN_ACCESS_KEY (a Rakuten Developers
+      # application registered as a Web application allowed the site's
+      # domain; Rakuten's applications expire after a year and are extended
+      # in its dashboard), RAKUTEN_AFFILIATE_ID (optional: affiliate links)
+      # and YAHOO_CLIENT_ID. Without them the step publishes the live file
+      # again and says so; refused keys fail the step with one error line,
+      # and the next step keeps the live file.
+      - name: Keep the last marketplace file if the build failed
+        run: |
+          if [ ! -f _site/market/sealed.json ]; then
+            mkdir -p _site/market
+            curl -fsSL "${SITE_URL}market/sealed.json" -o _site/market/sealed.json || rm -f _site/market/sealed.json
+            echo "::warning::The marketplace build failed; the live file was republished."
+          fi
+      # The Japan source: the shops' files merged, the cheapest in stock per
+      # cell and the shop that has it (scripts/build-japan.mjs; no requests).
+      - name: Merge the Japanese shops into the Japan files
+        continue-on-error: true
+        run: node scripts/japan-data-check.mjs && node scripts/build-japan.mjs --site _site
+      - name: Keep the last Japan files if the merge failed
+        run: |
+          if [ ! -f _site/japan/cards.json ]; then
+            mkdir -p _site/japan
+            for f in cards.json sealed.json; do
+              curl -fsSL "${SITE_URL}japan/$f" -o "_site/japan/$f" || rm -f "_site/japan/$f"
+            done
+            echo "::warning::The Japan merge failed; the live files were republished."
+          fi
+      # The files on Cloudflare Pages (https://stacksmith-app.pages.dev/),
+      # where the app reads them (static requests free and unmetered).
+      # Needs two repository secrets: CLOUDFLARE_API_TOKEN (an account API
+      # token, "stacksmith-site GitHub deploy", with Cloudflare Pages: Edit
+      # only, no expiry) and CLOUDFLARE_ACCOUNT_ID; skipped without them.
+      # A failure here still lets GitHub Pages deploy; the app repo's daily
+      # price-watch.yml emails the owner when the Cloudflare copy goes stale.
+      - name: Is Cloudflare set up?
+        id: cloudflare
+        env:
+          TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -n "$TOKEN" ] && [ -n "$ACCOUNT" ]; then echo "ready=true" >> "$GITHUB_OUTPUT"; else echo "ready=false" >> "$GITHUB_OUTPUT"; fi
+      - name: Publish to Cloudflare Pages
+        if: steps.cloudflare.outputs.ready == 'true'
+        continue-on-error: true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          npx --yes wrangler@4 pages project list | grep -q "stacksmith-app" || npx --yes wrangler@4 pages project create stacksmith-app --production-branch=main
+          npx --yes wrangler@4 pages deploy _site --project-name=stacksmith-app --branch=main --commit-dirty=true
