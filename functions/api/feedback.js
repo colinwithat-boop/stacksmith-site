@@ -4,8 +4,9 @@
 // GitHub Pages copy, which is why the page posts to the absolute address).
 //
 // It translates the message between Japanese and English with Claude and
-// emails the owner both versions through Resend. Secrets, set on the Pages
-// project (Settings > Variables and Secrets, Production):
+// emails the owner both versions through Resend. Secrets, kept as the
+// repository's secrets and written to the Pages project by both deploy
+// workflows before each deploy (prices.yml, publish-now.yml):
 //   FEEDBACK_TO        where the email goes (several addresses with commas)
 //   RESEND_API_KEY     resend.com; without a verified domain Resend delivers
 //                      onboarding@resend.dev mail only to the account's own

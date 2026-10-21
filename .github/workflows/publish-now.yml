@@ -172,6 +172,29 @@ jobs:
           ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           if [ -n "$TOKEN" ] && [ -n "$ACCOUNT" ]; then echo "ready=true" >> "$GITHUB_OUTPUT"; else echo "ready=false" >> "$GITHUB_OUTPUT"; fi
+      # The feedback page's Function (functions/api/feedback.js) reads three
+      # secrets from the Pages project. They are kept as repository secrets
+      # here, like the keys above, and written to the project before each
+      # deploy, which then carries them: FEEDBACK_TO (where the email goes),
+      # RESEND_API_KEY and ANTHROPIC_API_KEY (README). One left empty is
+      # skipped with a warning, and the Function says it is not configured.
+      - name: Set the feedback Function's secrets
+        if: steps.cloudflare.outputs.ready == 'true'
+        continue-on-error: true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          FEEDBACK_TO: ${{ secrets.FEEDBACK_TO }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          for name in FEEDBACK_TO RESEND_API_KEY ANTHROPIC_API_KEY; do
+            if [ -n "${!name}" ]; then
+              printf '%s' "${!name}" | npx --yes wrangler@4 pages secret put "$name" --project-name=stacksmith-app
+            else
+              echo "::warning::$name is not set; the feedback Function stays unconfigured."
+            fi
+          done
       - name: Publish to Cloudflare Pages
         if: steps.cloudflare.outputs.ready == 'true'
         continue-on-error: true

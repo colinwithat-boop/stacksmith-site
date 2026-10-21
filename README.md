@@ -19,10 +19,11 @@ morning).
   no copy of it, so the page posts to the Cloudflare address), which
   translates the message between Japanese and English with Claude
   (`claude-opus-5-5`, the original kept as written) and emails both to the
-  owner through Resend. Needs secrets on the Pages project (Settings >
-  Variables and Secrets, Production): `FEEDBACK_TO`, `RESEND_API_KEY`,
-  `ANTHROPIC_API_KEY` (optional: without it the email carries the original
-  only), `FEEDBACK_FROM` (optional). Without a verified domain Resend
+  owner through Resend. Needs three repository secrets, `FEEDBACK_TO`,
+  `RESEND_API_KEY` and `ANTHROPIC_API_KEY` (optional: without it the email
+  carries the original only), which both deploy workflows write to the
+  Pages project with `wrangler pages secret put` before each deploy
+  (`FEEDBACK_FROM`, optional, can be set on the project by hand). Without a verified domain Resend
   delivers mail from onboarding@resend.dev only to the Resend account's own
   address. Up to three photos ride along as email attachments (the page
   shrinks each to a 1600 px JPEG); nothing is stored anywhere and the
