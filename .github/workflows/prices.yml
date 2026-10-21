@@ -239,12 +239,14 @@ jobs:
           ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           if [ -n "$TOKEN" ] && [ -n "$ACCOUNT" ]; then echo "ready=true" >> "$GITHUB_OUTPUT"; else echo "ready=false" >> "$GITHUB_OUTPUT"; fi
-      # The feedback page's Function (functions/api/feedback.js) reads three
+      # The feedback page's Function (functions/api/feedback.js) reads its
       # secrets from the Pages project. They are kept as repository secrets
       # here, like the keys above, and written to the project before each
       # deploy, which then carries them: FEEDBACK_TO (where the email goes),
-      # RESEND_API_KEY and ANTHROPIC_API_KEY (README). One left empty is
-      # skipped with a warning, and the Function says it is not configured.
+      # RESEND_API_KEY, ANTHROPIC_API_KEY, and FEEDBACK_ISSUES_REPO with
+      # FEEDBACK_ISSUES_TOKEN for one GitHub issue per message (README). One
+      # left empty is skipped with a warning: without the first two the
+      # Function says it is not configured, without the others it does less.
       - name: Set the feedback Function's secrets
         if: steps.cloudflare.outputs.ready == 'true'
         continue-on-error: true
@@ -254,8 +256,10 @@ jobs:
           FEEDBACK_TO: ${{ secrets.FEEDBACK_TO }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          FEEDBACK_ISSUES_REPO: ${{ secrets.FEEDBACK_ISSUES_REPO }}
+          FEEDBACK_ISSUES_TOKEN: ${{ secrets.FEEDBACK_ISSUES_TOKEN }}
         run: |
-          for name in FEEDBACK_TO RESEND_API_KEY ANTHROPIC_API_KEY; do
+          for name in FEEDBACK_TO RESEND_API_KEY ANTHROPIC_API_KEY FEEDBACK_ISSUES_REPO FEEDBACK_ISSUES_TOKEN; do
             if [ -n "${!name}" ]; then
               printf '%s' "${!name}" | npx --yes wrangler@4 pages secret put "$name" --project-name=stacksmith-app
             else
