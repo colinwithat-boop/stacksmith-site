@@ -165,7 +165,8 @@ export async function onRequestPost({ request, env }) {
   const message = buildEmail(report, issue);
   const sent = await sendEmail(env, message, email, images);
   if (!sent && !(issue && issue.url)) return json({ error: 'send_failed' }, 502, headers);
-  return json({ ok: true }, 200, headers);
+  // The issue's outcome rides along for diagnosis (the page ignores it; no secret in it).
+  return json({ ok: true, issue: issue ? (issue.url ? 'created' : issue.note) : 'off' }, 200, headers);
 }
 
 /**
@@ -227,7 +228,10 @@ function bothLanguages({ text, translated }, heading) {
  * bug or enhancement: { url } or { note }, or null when not configured.
  */
 async function createIssue(env, report) {
-  if (!env.FEEDBACK_ISSUES_TOKEN || !env.FEEDBACK_ISSUES_REPO) return null;
+  // Trimmed: a value pasted with a trailing newline would break the header or the path.
+  const token = (env.FEEDBACK_ISSUES_TOKEN || '').trim();
+  const repo = (env.FEEDBACK_ISSUES_REPO || '').trim().replace(/^https?:\/\/github\.com\//, '').replace(/\/+$/, '');
+  if (!token || !repo) return null;
   const { type, screen, device, version, email, images, received } = report;
   const facts = [
     `**Type:** ${type.en}`,
@@ -244,10 +248,10 @@ async function createIssue(env, report) {
   const labels = ['feedback'];
   if (type.label) labels.push(type.label);
   try {
-    const res = await fetch(`https://api.github.com/repos/${env.FEEDBACK_ISSUES_REPO}/issues`, {
+    const res = await fetch(`https://api.github.com/repos/${repo}/issues`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${env.FEEDBACK_ISSUES_TOKEN}`,
+        Authorization: `Bearer ${token}`,
         Accept: 'application/vnd.github+json',
         'X-GitHub-Api-Version': '2022-11-28',
         'User-Agent': 'stacksmith-feedback',
@@ -256,8 +260,11 @@ async function createIssue(env, report) {
       body: JSON.stringify({ title: headline(report), body: bodyLines.join('\n'), labels }),
     });
     if (!res.ok) {
-      console.error('GitHub answered', res.status, await res.text());
-      return { note: `Issue not created: GitHub answered ${res.status}.` };
+      const detail = await res.text();
+      console.error('GitHub answered', res.status, detail);
+      let reason = '';
+      try { reason = JSON.parse(detail).message || ''; } catch {}
+      return { note: `Issue not created: GitHub answered ${res.status}${reason ? ` (${reason.slice(0, 120)})` : ''}.` };
     }
     const data = await res.json();
     return { url: data.html_url, number: data.number };
