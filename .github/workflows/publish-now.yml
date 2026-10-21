@@ -7,7 +7,7 @@
 # prices.yml's next run. Its own queue, so it never waits behind prices.yml
 # (whichever finishes last is live; both publish the same data). Runs once
 # when this file is pushed, otherwise only by hand from the Actions tab
-# (last pushed to write the feedback Function's secrets, 2026-10-21).
+# (last pushed to write the feedback Function's secrets, 2026-10-21, second run).
 name: Publish site now (shop prices kept)
 
 on:
