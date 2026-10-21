@@ -5,15 +5,15 @@
 # failed' warning is expected here). Publishes to Cloudflare Pages only, the
 # address the app and the /get/ link use; GitHub Pages catches up at
 # prices.yml's next run. Its own queue, so it never waits behind prices.yml
-# (whichever finishes last is live; both publish the same data). Runs once
-# when this file is pushed, otherwise only by hand from the Actions tab
-# (last pushed to write the feedback Function's secrets, 2026-10-21, second run).
+# (whichever finishes last is live; both publish the same data). Runs when
+# this file, the feedback page or its Function is pushed (so a feedback
+# change is live in minutes), otherwise only by hand from the Actions tab.
 name: Publish site now (shop prices kept)
 
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/publish-now.yml']
+    paths: ['.github/workflows/publish-now.yml', 'feedback.html', 'functions/**']
   workflow_dispatch:
 
 permissions:
