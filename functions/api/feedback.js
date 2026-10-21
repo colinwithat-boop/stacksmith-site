@@ -14,6 +14,9 @@
 //                      the original only, with a line saying so
 //   FEEDBACK_FROM      optional sender, default "Stacksmith <onboarding@resend.dev>"
 //
+// Photos ride along as email attachments (up to three JPEGs the page shrank),
+// never to Claude and never stored here.
+//
 // Abuse: a honeypot field (answered with a fake success), hard caps on every
 // field, one short Claude call per message. Cloudflare Turnstile can be added
 // in front if spam ever appears.
@@ -25,6 +28,11 @@ const ORIGINS = new Set([
 
 const MAX_TEXT = 3000;
 const MAX_SHORT = 200;
+// Photos arrive as base64 JPEGs the page already shrank (1600 px, under
+// 2,000,000 characters each) and leave as email attachments: nothing is
+// stored anywhere (the owner, 2026-10-21).
+const MAX_IMAGES = 3;
+const MAX_IMAGE_CHARS = 2000000;
 
 // The select values the page sends, named in both languages here so those
 // labels never go through the translator.
@@ -89,6 +97,18 @@ function field(body, name, max) {
   return typeof v === 'string' ? v.replace(/\r\n?/g, '\n').trim().slice(0, max) : '';
 }
 
+/** The photos the page sent, as Resend attachments: at most MAX_IMAGES, each a base64 string within the cap. */
+function readImages(list) {
+  if (!Array.isArray(list)) return [];
+  const out = [];
+  for (const item of list.slice(0, MAX_IMAGES)) {
+    const data = item && typeof item.data === 'string' ? item.data : '';
+    if (!data || data.length > MAX_IMAGE_CHARS || !/^[A-Za-z0-9+/]+={0,2}$/.test(data)) continue;
+    out.push({ filename: `feedback-${out.length + 1}.jpg`, content: data, content_type: 'image/jpeg' });
+  }
+  return out;
+}
+
 export async function onRequestOptions({ request }) {
   return new Response(null, { status: 204, headers: corsHeaders(request) });
 }
@@ -124,9 +144,11 @@ export async function onRequestPost({ request, env }) {
   const email = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailGiven) ? emailGiven : '';
   const agent = (request.headers.get('User-Agent') || '').slice(0, MAX_SHORT);
 
+  const images = readImages(body.images);
+
   const translated = await translate(env, text);
-  const message = buildEmail({ type, screen, device, version, email, agent, text, translated });
-  const sent = await sendEmail(env, message, email);
+  const message = buildEmail({ type, screen, device, version, email, agent, text, translated, images });
+  const sent = await sendEmail(env, message, email, images);
   if (!sent) return json({ error: 'send_failed' }, 502, headers);
   return json({ ok: true }, 200, headers);
 }
@@ -168,7 +190,7 @@ async function translate(env, text) {
   }
 }
 
-function buildEmail({ type, screen, device, version, email, agent, text, translated }) {
+function buildEmail({ type, screen, device, version, email, agent, text, translated, images }) {
   const english = translated.en || text;
   const firstLine = english.split('\n').find((l) => l.trim()) || '';
   const subject = `[Stacksmith] ${type.en}${screen ? ` · ${screen.en}` : ''}: ${firstLine.slice(0, 70)}${firstLine.length > 70 ? '…' : ''}`;
@@ -179,6 +201,7 @@ function buildEmail({ type, screen, device, version, email, agent, text, transla
     device ? `Device / 端末: ${device}` : null,
     version ? `App version / バージョン: ${version}` : null,
     email ? `Email / メール: ${email}` : null,
+    images.length ? `Photos / 写真: ${images.length} (attached / 添付)` : null,
     `Received / 受信: ${new Date().toISOString().replace('T', ' ').slice(0, 16)} UTC`,
     agent ? `Browser: ${agent}` : null,
     '',
@@ -197,7 +220,7 @@ function buildEmail({ type, screen, device, version, email, agent, text, transla
   return { subject, text: lines.join('\n') };
 }
 
-async function sendEmail(env, message, email) {
+async function sendEmail(env, message, email, images) {
   const payload = {
     from: env.FEEDBACK_FROM || 'Stacksmith <onboarding@resend.dev>',
     to: env.FEEDBACK_TO.split(',').map((s) => s.trim()).filter(Boolean),
@@ -206,6 +229,7 @@ async function sendEmail(env, message, email) {
   };
   // Reply straight to the writer when they left an address.
   if (email) payload.reply_to = email;
+  if (images.length) payload.attachments = images;
   try {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',

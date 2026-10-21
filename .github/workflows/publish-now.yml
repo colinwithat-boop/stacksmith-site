@@ -6,7 +6,8 @@
 # address the app and the /get/ link use; GitHub Pages catches up at
 # prices.yml's next run. Its own queue, so it never waits behind prices.yml
 # (whichever finishes last is live; both publish the same data). Runs once
-# when this file is pushed, otherwise only by hand from the Actions tab.
+# when this file is pushed, otherwise only by hand from the Actions tab
+# (last pushed to publish the feedback page at once, 2026-10-21).
 name: Publish site now (shop prices kept)
 
 on:

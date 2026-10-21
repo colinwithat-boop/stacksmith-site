@@ -24,7 +24,10 @@ morning).
   `ANTHROPIC_API_KEY` (optional: without it the email carries the original
   only), `FEEDBACK_FROM` (optional). Without a verified domain Resend
   delivers mail from onboarding@resend.dev only to the Resend account's own
-  address. A honeypot field and hard caps on every field stand in for a
+  address. Up to three photos ride along as email attachments (the page
+  shrinks each to a 1600 px JPEG); nothing is stored anywhere and the
+  photos never go to Claude. A honeypot field and hard caps on every field
+  stand in for a
   CAPTCHA; add Cloudflare Turnstile if spam appears. Try it locally with
   `npx wrangler@4 pages dev _site` after copying the pages into `_site`
   (no secrets: the function answers 503 `not_configured`).

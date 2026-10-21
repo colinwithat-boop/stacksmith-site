@@ -33,6 +33,12 @@
   .segments label:has(input:focus-visible) { outline: 2px solid #2b6cb0; outline-offset: 1px; }
   .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   @media (max-width: 420px) { .two { grid-template-columns: 1fr; } }
+  .shots { display: flex; flex-wrap: wrap; gap: 10px; }
+  .shot { position: relative; width: 72px; height: 72px; }
+  .shot img { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; border: 1px solid #c9cfd8; display: block; }
+  .shot button { position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; padding: 0; border-radius: 50%; font-size: 15px; line-height: 24px; background: #10141b; color: #fff; }
+  .pick { display: inline-block; justify-self: start; padding: 9px 14px; border: 1px solid #c9cfd8; border-radius: 8px; background: #fff; cursor: pointer; font-weight: 600; }
+  .pick:has(input:focus-visible) { outline: 2px solid #2b6cb0; outline-offset: 1px; }
   .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
   button { padding: 12px 20px; border: 0; border-radius: 8px; background: #2b6cb0; color: #fff; font-weight: 600; cursor: pointer; }
   button[disabled] { opacity: 0.6; cursor: default; }
@@ -47,7 +53,8 @@
     a { color: #7fb4ee; }
     .lead, .hint, .note, .legal { color: #98a1b0; }
     .legal { border-top-color: #282d36; }
-    input, select, textarea, .segments label, .done { background: #181b21; border-color: #343a45; }
+    input, select, textarea, .segments label, .done, .pick, .shot img { background: #181b21; border-color: #343a45; }
+    .shot button { background: #e9edf3; color: #10141b; }
     .segments label:has(input:checked) { background: #3b82f6; border-color: #3b82f6; color: #fff; }
     .status.error { color: #f97066; }
   }
@@ -102,6 +109,13 @@
       </label>
     </div>
 
+    <fieldset>
+      <legend>スクリーンショットや写真（任意、3枚まで）</legend>
+      <div class="shots" id="shots"></div>
+      <label class="pick" id="pick"><input id="photos" type="file" accept="image/*" multiple hidden>写真を選ぶ</label>
+      <span class="hint">画面の写真があると助かります。</span>
+    </fieldset>
+
     <label>
       <span class="label">メールアドレス（任意）</span>
       <input id="email" name="email" type="email" inputmode="email" autocomplete="email" maxlength="200" placeholder="example@example.com">
@@ -125,7 +139,7 @@
     <p><a href="#" id="again">もう一件送る</a></p>
   </div>
 
-  <p class="note">送信した内容とメールアドレス、お使いのブラウザの種類は、開発者へのメールにだけ使います。英語訳は AI (Claude) が作ります。<a href="privacy.html">プライバシーポリシー</a>（英語）</p>
+  <p class="note">送信した内容と写真、メールアドレス、お使いのブラウザの種類は、開発者へのメールにだけ使います。英語訳は AI (Claude) が作ります。<a href="privacy.html">プライバシーポリシー</a>（英語）</p>
 
   <p class="legal">Magic: The Gathering は Wizards of the Coast の著作物です。Stacksmith は Wizards of the Coast が製作、承認、支援するものではなく、提携もしていません。</p>
 </main>
@@ -160,6 +174,85 @@ form.addEventListener('change', function (e) {
 });
 showBugFields();
 
+// Photos: up to three, shrunk here to a 1600 px JPEG and sent as base64 with
+// the message; the function attaches them to the email, so nothing is
+// stored anywhere (the owner, 2026-10-21).
+var MAX_SHOTS = 3;
+var MAX_SHOT_CHARS = 2000000;
+var images = [];
+var shots = document.getElementById('shots');
+var photos = document.getElementById('photos');
+var pick = document.getElementById('pick');
+
+function shrink(file) {
+  return new Promise(function (resolve, reject) {
+    var url = URL.createObjectURL(file);
+    var img = new Image();
+    img.onload = function () {
+      URL.revokeObjectURL(url);
+      var scale = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
+      var canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
+      canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      var quality = 0.8;
+      var data = canvas.toDataURL('image/jpeg', quality);
+      while (data.length > MAX_SHOT_CHARS && quality > 0.3) {
+        quality -= 0.2;
+        data = canvas.toDataURL('image/jpeg', quality);
+      }
+      if (data.length > MAX_SHOT_CHARS) return reject(new Error('too big'));
+      resolve({ preview: data, data: data.slice(data.indexOf(',') + 1) });
+    };
+    img.onerror = function () {
+      URL.revokeObjectURL(url);
+      reject(new Error('decode'));
+    };
+    img.src = url;
+  });
+}
+
+function renderShots() {
+  shots.textContent = '';
+  images.forEach(function (image, i) {
+    var box = document.createElement('div');
+    box.className = 'shot';
+    var img = document.createElement('img');
+    img.src = image.preview;
+    img.alt = '写真' + (i + 1);
+    var remove = document.createElement('button');
+    remove.type = 'button';
+    remove.textContent = '×';
+    remove.setAttribute('aria-label', '写真' + (i + 1) + 'を外す');
+    remove.addEventListener('click', function () {
+      images.splice(i, 1);
+      renderShots();
+    });
+    box.appendChild(img);
+    box.appendChild(remove);
+    shots.appendChild(box);
+  });
+  pick.hidden = images.length >= MAX_SHOTS;
+}
+
+photos.addEventListener('change', function () {
+  var files = Array.prototype.slice.call(photos.files || []).slice(0, MAX_SHOTS - images.length);
+  photos.value = '';
+  if (!files.length) return;
+  setStatus('写真を読み込んでいます。', false);
+  Promise.all(files.map(function (file) {
+    return shrink(file).catch(function () { return null; });
+  })).then(function (results) {
+    var failed = 0;
+    results.forEach(function (result) {
+      if (!result) failed += 1;
+      else if (images.length < MAX_SHOTS) images.push(result);
+    });
+    renderShots();
+    setStatus(failed ? '読み込めない写真がありました。' : '', failed > 0);
+  });
+});
+
 form.addEventListener('submit', function (e) {
   e.preventDefault();
   var text = document.getElementById('text').value.trim();
@@ -176,6 +269,7 @@ form.addEventListener('submit', function (e) {
     device: isBug ? document.getElementById('device').value.trim() : '',
     version: isBug ? document.getElementById('version').value.trim() : '',
     email: document.getElementById('email').value.trim(),
+    images: images.map(function (image) { return { data: image.data }; }),
     website: form.elements.website.value
   };
   send.disabled = true;
@@ -205,6 +299,8 @@ document.getElementById('again').addEventListener('click', function (e) {
   e.preventDefault();
   form.reset();
   showBugFields();
+  images = [];
+  renderShots();
   done.hidden = true;
   form.hidden = false;
   document.getElementById('text').focus();
