@@ -8,6 +8,8 @@
 # (whichever finishes last is live; both publish the same data). Runs when
 # this file, the feedback page or its Function is pushed (so a feedback
 # change is live in minutes), otherwise only by hand from the Actions tab.
+# (A push of this file is also how new secrets reach the Pages project at
+# once; last done 2026-10-21 for the GitHub issue token.)
 name: Publish site now (shop prices kept)
 
 on:
