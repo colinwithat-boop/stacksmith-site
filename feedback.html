@@ -3,17 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Stacksmith ご意見と不具合の報告</title>
+<title>Stacksmith ご意見・不具合の報告</title>
 <meta name="description" content="Stacksmith の不具合の報告や機能のご要望はこちらから。">
 <style>
   :root { color-scheme: light dark; }
-  body { margin: 0; padding: 32px 16px 64px; font: 16px/1.7 system-ui, -apple-system, "Segoe UI", Roboto, "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif; background: #f6f7f9; color: #10141b; }
+  body { margin: 0; padding: 24px 16px 64px; font: 16px/1.7 system-ui, -apple-system, "Segoe UI", Roboto, "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif; background: #f6f7f9; color: #10141b; }
   main { max-width: 560px; margin: 0 auto; }
+  [hidden] { display: none !important; }
+  .top { display: flex; justify-content: flex-end; margin-bottom: 12px; }
   h1 { font-size: 24px; margin: 0 0 6px; }
   p { margin: 0 0 10px; }
   a { color: #2b6cb0; }
   .lead { color: #5b6472; margin-bottom: 28px; }
-  [hidden] { display: none !important; }
   form { display: grid; gap: 18px; }
   label, fieldset { display: grid; gap: 6px; margin: 0; padding: 0; border: 0; min-width: 0; }
   legend, .label { font-weight: 600; padding: 0; }
@@ -22,15 +23,17 @@
   input, select, textarea { width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1px solid #c9cfd8; border-radius: 8px; background: #fff; color: inherit; }
   textarea { min-height: 160px; resize: vertical; }
   input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid #2b6cb0; outline-offset: 1px; }
-  .segments { display: flex; gap: 0; }
-  .segments label { flex: 1; display: block; text-align: center; padding: 9px 4px; border: 1px solid #c9cfd8; background: #fff; cursor: pointer; }
-  .segments label:first-child { border-radius: 8px 0 0 8px; }
-  .segments label:last-child { border-radius: 0 8px 8px 0; }
-  .segments label + label { margin-left: -1px; }
+  .segments { display: flex; }
+  .segments label, .segments button { flex: 1; display: flex; align-items: center; justify-content: center; text-align: center; padding: 9px 4px; border: 1px solid #c9cfd8; background: #fff; color: inherit; cursor: pointer; font-weight: 400; }
+  .segments > :first-child { border-radius: 8px 0 0 8px; }
+  .segments > :last-child { border-radius: 0 8px 8px 0; }
+  .segments > * + * { margin-left: -1px; }
   .segments input { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .segments input:checked + span { font-weight: 600; }
-  .segments label:has(input:checked) { background: #2b6cb0; border-color: #2b6cb0; color: #fff; z-index: 1; }
+  .segments label:has(input:checked), .segments button[aria-pressed="true"] { background: #2b6cb0; border-color: #2b6cb0; color: #fff; font-weight: 600; z-index: 1; }
   .segments label:has(input:focus-visible) { outline: 2px solid #2b6cb0; outline-offset: 1px; }
+  .lang { flex: 0 0 auto; }
+  .lang button { flex: 0 0 auto; min-width: 84px; padding: 6px 12px; font-size: 14px; }
   .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   @media (max-width: 420px) { .two { grid-template-columns: 1fr; } }
   .shots { display: flex; flex-wrap: wrap; gap: 10px; }
@@ -40,8 +43,8 @@
   .pick { display: inline-block; justify-self: start; padding: 9px 14px; border: 1px solid #c9cfd8; border-radius: 8px; background: #fff; cursor: pointer; font-weight: 600; }
   .pick:has(input:focus-visible) { outline: 2px solid #2b6cb0; outline-offset: 1px; }
   .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
-  button { padding: 12px 20px; border: 0; border-radius: 8px; background: #2b6cb0; color: #fff; font-weight: 600; cursor: pointer; }
-  button[disabled] { opacity: 0.6; cursor: default; }
+  .send { padding: 12px 20px; border: 0; border-radius: 8px; background: #2b6cb0; color: #fff; font-weight: 600; cursor: pointer; }
+  .send[disabled] { opacity: 0.6; cursor: default; }
   .status { min-height: 1.5em; }
   .status.error { color: #b42318; }
   .done { padding: 20px; border: 1px solid #c9cfd8; border-radius: 8px; background: #fff; }
@@ -53,73 +56,80 @@
     a { color: #7fb4ee; }
     .lead, .hint, .note, .legal { color: #98a1b0; }
     .legal { border-top-color: #282d36; }
-    input, select, textarea, .segments label, .done, .pick, .shot img { background: #181b21; border-color: #343a45; }
+    input, select, textarea, .segments label, .segments button, .done, .pick, .shot img { background: #181b21; border-color: #343a45; }
+    .segments label:has(input:checked), .segments button[aria-pressed="true"] { background: #3b82f6; border-color: #3b82f6; color: #fff; }
     .shot button { background: #e9edf3; color: #10141b; }
-    .segments label:has(input:checked) { background: #3b82f6; border-color: #3b82f6; color: #fff; }
     .status.error { color: #f97066; }
   }
 </style>
 </head>
 <body>
 <main>
-  <h1>Stacksmith へのご意見</h1>
-  <p class="lead">不具合の報告や機能のご要望はこちらからどうぞ。</p>
+  <div class="top">
+    <div class="segments lang" role="group" aria-label="Language">
+      <button type="button" id="langJa" aria-pressed="true">日本語</button>
+      <button type="button" id="langEn" aria-pressed="false">English</button>
+    </div>
+  </div>
+
+  <h1 data-i18n="title">Stacksmith へのご意見</h1>
+  <p class="lead" data-i18n="lead">不具合の報告や機能のご要望はこちらからどうぞ。</p>
 
   <form id="form" novalidate>
     <fieldset>
-      <legend>種類</legend>
+      <legend data-i18n="type">種類</legend>
       <div class="segments" role="radiogroup">
-        <label><input type="radio" name="type" value="bug" checked><span>不具合</span></label>
-        <label><input type="radio" name="type" value="idea"><span>機能の要望</span></label>
-        <label><input type="radio" name="type" value="other"><span>その他</span></label>
+        <label><input type="radio" name="type" value="bug" checked><span data-i18n="typeBug">不具合</span></label>
+        <label><input type="radio" name="type" value="idea"><span data-i18n="typeIdea">機能の要望</span></label>
+        <label><input type="radio" name="type" value="other"><span data-i18n="typeOther">その他</span></label>
       </div>
     </fieldset>
 
     <label>
-      <span class="label">画面</span>
+      <span class="label" data-i18n="screen">画面</span>
       <select id="screen" name="screen">
-        <option value="">選んでください</option>
-        <option value="home">ホーム</option>
-        <option value="scan">スキャン</option>
-        <option value="inventory">コレクション</option>
-        <option value="decks">マイデッキ</option>
-        <option value="search">デッキ検索</option>
-        <option value="sealed">未開封</option>
-        <option value="play">プレイ（ライフカウンター）</option>
-        <option value="settings">設定</option>
-        <option value="other">その他</option>
+        <option value="" data-i18n="screenPick">選んでください</option>
+        <option value="home" data-i18n="screenHome">ホーム</option>
+        <option value="scan" data-i18n="screenScan">スキャン</option>
+        <option value="inventory" data-i18n="screenInventory">コレクション</option>
+        <option value="decks" data-i18n="screenDecks">マイデッキ</option>
+        <option value="search" data-i18n="screenSearch">デッキ検索</option>
+        <option value="sealed" data-i18n="screenSealed">未開封</option>
+        <option value="play" data-i18n="screenPlay">プレイ（ライフカウンター）</option>
+        <option value="settings" data-i18n="screenSettings">設定</option>
+        <option value="other" data-i18n="screenOther">その他</option>
       </select>
     </label>
 
     <label>
-      <span class="label">内容</span>
-      <textarea id="text" name="text" maxlength="3000" required placeholder="何が起きたか、どうなってほしいかを書いてください。カード名や操作の手順があると助かります。"></textarea>
-      <span class="hint">3000文字まで</span>
+      <span class="label" data-i18n="message">内容</span>
+      <textarea id="text" name="text" maxlength="3000" required data-i18n-placeholder="messagePlaceholder" placeholder="どんなことが起きたか、どうなってほしいかを書いてください。カード名や操作の手順があると助かります。"></textarea>
+      <span class="hint" data-i18n="messageHint">3000文字まで</span>
     </label>
 
     <div class="two" id="bugFields">
       <label>
-        <span class="label">端末とOS（任意）</span>
-        <input id="device" name="device" maxlength="200" placeholder="例: Pixel 8, Android 15" autocomplete="off">
+        <span class="label" data-i18n="device">端末とOS（任意）</span>
+        <input id="device" name="device" maxlength="200" data-i18n-placeholder="devicePlaceholder" placeholder="例: Pixel 8, Android 15" autocomplete="off">
       </label>
       <label>
-        <span class="label">アプリのバージョン（任意）</span>
-        <input id="version" name="version" maxlength="200" placeholder="例: 2.0" autocomplete="off">
-        <span class="hint">設定 &gt; アプリについて に表示されます。</span>
+        <span class="label" data-i18n="version">アプリのバージョン（任意）</span>
+        <input id="version" name="version" maxlength="200" data-i18n-placeholder="versionPlaceholder" placeholder="例: 2.0" autocomplete="off">
+        <span class="hint" data-i18n="versionHint">設定 &gt; アプリについて に表示されます。</span>
       </label>
     </div>
 
     <fieldset>
-      <legend>スクリーンショットや写真（任意、3枚まで）</legend>
+      <legend data-i18n="photos">スクリーンショットや写真（任意、3枚まで）</legend>
       <div class="shots" id="shots"></div>
-      <label class="pick" id="pick"><input id="photos" type="file" accept="image/*" multiple hidden>写真を選ぶ</label>
-      <span class="hint">画面の写真があると助かります。</span>
+      <label class="pick" id="pick"><input id="photos" type="file" accept="image/*" multiple hidden><span data-i18n="photosPick">写真を選ぶ</span></label>
+      <span class="hint" data-i18n="photosHint">画面の写真があると助かります。</span>
     </fieldset>
 
     <label>
-      <span class="label">メールアドレス（任意）</span>
-      <input id="email" name="email" type="email" inputmode="email" autocomplete="email" maxlength="200" placeholder="example@example.com">
-      <span class="hint">返信や確認の質問を受け取ってもよい場合に入力してください。</span>
+      <span class="label" data-i18n="email">メールアドレス（任意）</span>
+      <input id="email" name="email" type="email" inputmode="email" autocomplete="email" maxlength="200" data-i18n-placeholder="emailPlaceholder" placeholder="example@example.com">
+      <span class="hint" data-i18n="emailHint">返信や確認のご連絡を受け取ってもよければご記入ください。</span>
     </label>
 
     <label class="hp" aria-hidden="true">
@@ -128,26 +138,117 @@
     </label>
 
     <div>
-      <button id="send" type="submit">送信</button>
+      <button id="send" class="send" type="submit" data-i18n="send">送信</button>
     </div>
     <p id="status" class="status" role="status" aria-live="polite"></p>
   </form>
 
   <div id="done" class="done" hidden>
-    <h2>送信しました。ありがとうございます。</h2>
-    <p>内容は開発者に届きました。返信が必要な場合は、書いていただいたメールアドレスにご連絡します。</p>
-    <p><a href="#" id="again">もう一件送る</a></p>
+    <h2 data-i18n="doneTitle">送信しました。ありがとうございます。</h2>
+    <p data-i18n="doneBody">開発者に届きました。返信が必要な場合は、ご記入いただいたメールアドレスにご連絡します。</p>
+    <p><a href="#" id="again" data-i18n="again">もう一件送る</a></p>
   </div>
 
-  <p class="note">送信した内容と写真、メールアドレス、お使いのブラウザの種類は、開発者へのメールにだけ使います。英語訳は AI (Claude) が作ります。<a href="privacy.html">プライバシーポリシー</a>（英語）</p>
+  <p class="note"><span data-i18n="note">送信内容、写真、メールアドレス、ブラウザの種類は、開発者へのメール以外には使いません。日本語と英語の間の翻訳は AI（Claude）が行います。</span> <a href="privacy.html" data-i18n="privacy">プライバシーポリシー（英語）</a></p>
 
-  <p class="legal">Magic: The Gathering は Wizards of the Coast の著作物です。Stacksmith は Wizards of the Coast が製作、承認、支援するものではなく、提携もしていません。</p>
+  <p class="legal" data-i18n="legal">Magic: The Gathering は Wizards of the Coast の著作物です。Stacksmith は Wizards of the Coast が製作、承認、支援するものではなく、提携もしていません。</p>
 </main>
 
 <script>
 // Posts to the Cloudflare copy of the site by its full address, because the
 // same page is also served from GitHub Pages, which has no /api/.
 var API = 'https://stacksmith-app.pages.dev/api/feedback';
+
+// Every word on the page, in both languages. The HTML carries the Japanese,
+// so the page reads right before this script runs.
+var STR = {
+  ja: {
+    pageTitle: 'Stacksmith ご意見・不具合の報告',
+    title: 'Stacksmith へのご意見',
+    lead: '不具合の報告や機能のご要望はこちらからどうぞ。',
+    type: '種類', typeBug: '不具合', typeIdea: '機能の要望', typeOther: 'その他',
+    screen: '画面', screenPick: '選んでください',
+    screenHome: 'ホーム', screenScan: 'スキャン', screenInventory: 'コレクション', screenDecks: 'マイデッキ',
+    screenSearch: 'デッキ検索', screenSealed: '未開封', screenPlay: 'プレイ（ライフカウンター）', screenSettings: '設定', screenOther: 'その他',
+    message: '内容',
+    messagePlaceholder: 'どんなことが起きたか、どうなってほしいかを書いてください。カード名や操作の手順があると助かります。',
+    messageHint: '3000文字まで',
+    device: '端末とOS（任意）', devicePlaceholder: '例: Pixel 8, Android 15',
+    version: 'アプリのバージョン（任意）', versionPlaceholder: '例: 2.0', versionHint: '設定 > アプリについて に表示されます。',
+    photos: 'スクリーンショットや写真（任意、3枚まで）', photosPick: '写真を選ぶ', photosHint: '画面の写真があると助かります。',
+    photoN: function (n) { return '写真' + n; },
+    photoRemove: function (n) { return '写真' + n + 'を外す'; },
+    email: 'メールアドレス（任意）', emailPlaceholder: 'example@example.com',
+    emailHint: '返信や確認のご連絡を受け取ってもよければご記入ください。',
+    send: '送信',
+    sending: '送信しています。',
+    needText: '内容を入力してください。',
+    failed: '送信できませんでした。しばらくしてからもう一度お試しください。',
+    loadingPhotos: '写真を読み込んでいます。',
+    photosFailed: '読み込めない写真がありました。',
+    doneTitle: '送信しました。ありがとうございます。',
+    doneBody: '開発者に届きました。返信が必要な場合は、ご記入いただいたメールアドレスにご連絡します。',
+    again: 'もう一件送る',
+    note: '送信内容、写真、メールアドレス、ブラウザの種類は、開発者へのメール以外には使いません。日本語と英語の間の翻訳は AI（Claude）が行います。',
+    privacy: 'プライバシーポリシー（英語）',
+    legal: 'Magic: The Gathering は Wizards of the Coast の著作物です。Stacksmith は Wizards of the Coast が製作、承認、支援するものではなく、提携もしていません。'
+  },
+  en: {
+    pageTitle: 'Stacksmith feedback',
+    title: 'Stacksmith feedback',
+    lead: 'Report a bug or suggest a feature.',
+    type: 'Type', typeBug: 'Bug', typeIdea: 'Feature request', typeOther: 'Other',
+    screen: 'Screen', screenPick: 'Choose a screen',
+    screenHome: 'Home', screenScan: 'Scan', screenInventory: 'Inventory', screenDecks: 'My Decks',
+    screenSearch: 'Deck Search', screenSealed: 'Sealed', screenPlay: 'Play (life counter)', screenSettings: 'Settings', screenOther: 'Other',
+    message: 'Message',
+    messagePlaceholder: 'What happened, or what would you like to see? Card names and the steps you took help a lot.',
+    messageHint: 'Up to 3,000 characters',
+    device: 'Phone and OS (optional)', devicePlaceholder: 'e.g. Pixel 8, Android 15',
+    version: 'App version (optional)', versionPlaceholder: 'e.g. 2.0', versionHint: 'Shown under Settings > About.',
+    photos: 'Screenshots or photos (optional, up to 3)', photosPick: 'Choose photos', photosHint: 'A picture of the screen helps.',
+    photoN: function (n) { return 'Photo ' + n; },
+    photoRemove: function (n) { return 'Remove photo ' + n; },
+    email: 'Email (optional)', emailPlaceholder: 'you@example.com',
+    emailHint: 'Only if you would like a reply or do not mind a follow-up question.',
+    send: 'Send',
+    sending: 'Sending…',
+    needText: 'Please write a message first.',
+    failed: 'That did not go through. Please try again in a bit.',
+    loadingPhotos: 'Loading photos…',
+    photosFailed: 'Some photos could not be loaded.',
+    doneTitle: 'Sent. Thank you!',
+    doneBody: 'Your message is on its way to the developer. If you left an email address, you will hear back there.',
+    again: 'Send another',
+    note: 'What you send, including photos, your email address and your browser type, is used only for the email to the developer. Messages are translated between Japanese and English by AI (Claude).',
+    privacy: 'Privacy policy',
+    legal: 'Magic: The Gathering is copyrighted by Wizards of the Coast. Stacksmith is not produced, endorsed, supported, or affiliated with Wizards of the Coast.'
+  }
+};
+
+var lang = 'ja';
+function t(key, arg) {
+  var value = STR[lang][key];
+  return typeof value === 'function' ? value(arg) : value;
+}
+
+function applyLanguage(next) {
+  lang = STR[next] ? next : 'ja';
+  document.documentElement.lang = lang;
+  document.title = t('pageTitle');
+  var nodes = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < nodes.length; i++) nodes[i].textContent = t(nodes[i].getAttribute('data-i18n'));
+  var fields = document.querySelectorAll('[data-i18n-placeholder]');
+  for (var j = 0; j < fields.length; j++) fields[j].placeholder = t(fields[j].getAttribute('data-i18n-placeholder'));
+  document.getElementById('langJa').setAttribute('aria-pressed', String(lang === 'ja'));
+  document.getElementById('langEn').setAttribute('aria-pressed', String(lang === 'en'));
+  renderShots();
+  try { localStorage.setItem('lang', lang); } catch (e) {}
+}
+
+document.getElementById('langJa').addEventListener('click', function () { applyLanguage('ja'); });
+document.getElementById('langEn').addEventListener('click', function () { applyLanguage('en'); });
+
 var form = document.getElementById('form');
 // Not named "status": a top-level var of that name is window.status, a string.
 var statusLine = document.getElementById('status');
@@ -219,11 +320,11 @@ function renderShots() {
     box.className = 'shot';
     var img = document.createElement('img');
     img.src = image.preview;
-    img.alt = '写真' + (i + 1);
+    img.alt = t('photoN', i + 1);
     var remove = document.createElement('button');
     remove.type = 'button';
     remove.textContent = '×';
-    remove.setAttribute('aria-label', '写真' + (i + 1) + 'を外す');
+    remove.setAttribute('aria-label', t('photoRemove', i + 1));
     remove.addEventListener('click', function () {
       images.splice(i, 1);
       renderShots();
@@ -239,7 +340,7 @@ photos.addEventListener('change', function () {
   var files = Array.prototype.slice.call(photos.files || []).slice(0, MAX_SHOTS - images.length);
   photos.value = '';
   if (!files.length) return;
-  setStatus('写真を読み込んでいます。', false);
+  setStatus(t('loadingPhotos'), false);
   Promise.all(files.map(function (file) {
     return shrink(file).catch(function () { return null; });
   })).then(function (results) {
@@ -249,7 +350,7 @@ photos.addEventListener('change', function () {
       else if (images.length < MAX_SHOTS) images.push(result);
     });
     renderShots();
-    setStatus(failed ? '読み込めない写真がありました。' : '', failed > 0);
+    setStatus(failed ? t('photosFailed') : '', failed > 0);
   });
 });
 
@@ -257,7 +358,7 @@ form.addEventListener('submit', function (e) {
   e.preventDefault();
   var text = document.getElementById('text').value.trim();
   if (!text) {
-    setStatus('内容を入力してください。', true);
+    setStatus(t('needText'), true);
     document.getElementById('text').focus();
     return;
   }
@@ -273,7 +374,7 @@ form.addEventListener('submit', function (e) {
     website: form.elements.website.value
   };
   send.disabled = true;
-  setStatus('送信しています。', false);
+  setStatus(t('sending'), false);
   fetch(API, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -289,7 +390,7 @@ form.addEventListener('submit', function (e) {
     done.querySelector('h2').setAttribute('tabindex', '-1');
     done.querySelector('h2').focus();
   }).catch(function () {
-    setStatus('送信できませんでした。しばらくしてからもう一度お試しください。', true);
+    setStatus(t('failed'), true);
   }).then(function () {
     send.disabled = false;
   });
@@ -305,6 +406,11 @@ document.getElementById('again').addEventListener('click', function (e) {
   form.hidden = false;
   document.getElementById('text').focus();
 });
+
+// Japanese for a Japanese browser, English otherwise; the toggle is remembered.
+var saved = null;
+try { saved = localStorage.getItem('lang'); } catch (e) {}
+applyLanguage(saved || ((navigator.language || '').toLowerCase().indexOf('ja') === 0 ? 'ja' : 'en'));
 </script>
 </body>
 </html>
