@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Get Stacksmith</title>
+<meta property="og:title" content="Stacksmith: MTG Card Scanner">
+<meta property="og:description" content="Scan your Magic cards. On the App Store and Google Play.">
+<meta property="og:image" content="https://stacksmith-app.pages.dev/get/icon.png">
+<script>
+// One link for both stores (the Instagram Story's link sticker): an iPhone or iPad goes to the
+// App Store, an Android phone to Google Play, anything else stays here and picks a button.
+// Nothing is stored or sent anywhere.
+var STORES = {
+  ios: 'https://apps.apple.com/app/id6817541736',
+  android: 'https://play.google.com/store/apps/details?id=com.kuruton.stacksmith'
+};
+function pickStore(ua, touchPoints) {
+  if (/iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && touchPoints > 1)) return 'ios';
+  if (/Android/.test(ua)) return 'android';
+  return null;
+}
+var store = pickStore(navigator.userAgent || '', navigator.maxTouchPoints || 0);
+if (store) location.replace(STORES[store]);
+</script>
+<style>
+  body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: #111822; color: #fff; font-family: system-ui, -apple-system, "Segoe UI", "Hiragino Sans", "Yu Gothic", sans-serif; text-align: center; }
+  main { padding: 32px 16px; }
+  img { width: 112px; height: 112px; border-radius: 26px; }
+  h1 { margin: 20px 0 6px; font-size: 28px; }
+  p { margin: 0 0 28px; color: #bbc3ce; }
+  a { display: block; width: 240px; margin: 12px auto; padding: 14px 0; border-radius: 12px;
+    background: #34d399; color: #0b1a14; font-weight: 700; font-size: 18px; text-decoration: none; }
+</style>
+</head>
+<body>
+<main>
+  <img src="icon.png" alt="">
+  <h1>Stacksmith</h1>
+  <p>MTG card scanner<br>MTGカードスキャナー</p>
+  <a href="https://apps.apple.com/app/id6817541736">App Store</a>
+  <a href="https://play.google.com/store/apps/details?id=com.kuruton.stacksmith">Google Play</a>
+</main>
+</body>
+</html>

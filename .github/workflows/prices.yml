@@ -84,7 +84,7 @@ jobs:
         run: |
           mkdir -p _site
           cp index.html privacy.html support.html 404.html _site/
-          cp -r packs sets delta sealed _site/
+          cp -r packs sets delta sealed get _site/
       - name: Check the price file layout
         run: node scripts/price-changes-check.mjs
       # Only the morning run (or one started by hand with new_version) makes
