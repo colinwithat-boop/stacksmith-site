@@ -48,6 +48,10 @@ check('the cards merge: the cheapest in stock per cell across shops, else the ch
   assert.deepEqual(withDay[0].slice(10), ['0.34', '0.54', null, '0.35', '0.49'], "the file's columns 1 to 5");
   assert.deepEqual(withDay[1].slice(10), [null, null, null, null, null], 'a printing the file lacks');
   assert.equal(withDay[0].length, 15);
+  assert.deepEqual(withDay[2], ['zz', null, null, null, null, null, null, null, null, 0, '1', null, null, null, null], "a printing no shop lists: the day's prices alone, no shop, nothing in stock (2026-10-22)");
+  assert.equal(withDay.length, 3);
+  const dayEurOnly = dailyPrices({ rows: [['eu', null, null, null, '0.35', null, null, null], ['bare', null, null, null, null, null, null, null]] });
+  assert.deepEqual(mergeCardRows({ hareruya: { rows: [] } }, dayEurOnly).map((r) => r[0]), ['eu'], 'a euro-only printing gets its row (a European copy is priced from it); one with no price at all none');
 });
 
 check("a yen price out of line with the day's dollars is dropped: the gold Smaug at ¥2,500 against $24,500", () => {
@@ -72,8 +76,11 @@ check("a yen price out of line with the day's dollars is dropped: the gold Smaug
   assert.deepEqual(by.smaug.slice(0, 10), ['smaug', null, 200000, null, null, null, null, 77, 'hareruya', 0], "Bigweb's ¥2,500 English foil is gone; Hareruya's ¥200,000 Japanese foil stays");
   assert.deepEqual(by.fine.slice(1, 7), [4500, 3500, null, 4000, 3500, null], 'a card in line keeps every cell');
   assert.deepEqual(dropped, [['smaug', 4, 'bigweb', 2500, 24500]]);
-  // The only cell dropped: no row at all, so the app shows no price rather than a wrong one.
-  assert.deepEqual(mergeCardRows({ bigweb: { rows: [['smaug', null, null, null, null, 2500, null, 3574280, 0]] } }, daily), []);
+  // The only cell dropped: a row of the day's dollars alone, so the app prices it from TCGplayer in yen rather than at ¥2,500.
+  assert.deepEqual(mergeCardRows({ bigweb: { rows: [['smaug', null, null, null, null, 2500, null, 3574280, 0]] } }, daily), [
+    ['fine', null, null, null, null, null, null, null, null, 0, '17.97', '20.18', null, null, null],
+    ['smaug', null, null, null, null, null, null, null, null, 0, null, '24500.00', null, null, '300.00'],
+  ]);
 });
 
 check('the sealed merge: per product and language, in stock first, then price, with the shop', () => {

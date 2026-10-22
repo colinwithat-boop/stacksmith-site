@@ -20,7 +20,13 @@
 // trend euros from the daily price file, so a phone on the Japan source
 // prices its English copies' dollars and its European-language copies'
 // euros without the daily file (the owner: a copy priced where its
-// language is sold).
+// language is sold). Since 2026-10-22 a printing the day's file prices
+// that NO shop lists (or whose every shop price was out of line) is a row
+// too, its six cells, product and shop null and its stock 0, with the
+// day's prices alone: the app takes the dollars as yen at the ECB's rate
+// (the owner: "fall back on tcgplayer price converted to yen if we dont
+// get anything from all of our japanese retailers"). Measured 2026-10-22
+// on the live files: 88,898 shop rows, 15,876 such rows.
 // A shop's sealed file has cells [price, product, in stock] under `ja` and
 // `en`; the merged one [price, product, in stock, shop].
 
@@ -70,7 +76,8 @@ export function outOfLine(yen, usd) {
  * are the cheapest in-stock cell's shop, else the cheapest cell's. With
  * the day's prices (`daily`, dailyPrices) a cell out of line with its
  * dollars (outOfLine) is left out, and noted in `dropped` when given:
- * [id, cell, shop, yen, usd].
+ * [id, cell, shop, yen, usd]; and a printing the day's file prices that
+ * no shop lists gets a row of the day's prices alone (shop null, stock 0).
  */
 export function mergeCardRows(files, daily = null, dropped = null) {
   const byId = new Map();
@@ -101,6 +108,7 @@ export function mergeCardRows(files, daily = null, dropped = null) {
     }
   }
   const rows = [];
+  const listed = new Set();
   for (const [id, { cells }] of byId) {
     let best = null;
     let mask = 0;
@@ -111,8 +119,17 @@ export function mergeCardRows(files, daily = null, dropped = null) {
       if (!best || (c.stock && !best.stock) || (c.stock === best.stock && c.price < best.price)) best = c;
     }
     if (!best) continue;
+    listed.add(id);
     const day = daily ? daily.get(id) : null;
     rows.push([id, ...cells.map((c) => (c ? c.price : null)), best.product, best.shop, mask, ...(day ?? [null, null, null, null, null])]);
+  }
+  // A printing no shop lists, with a price in the day's file: the day's
+  // prices alone (2026-10-22).
+  if (daily) {
+    for (const [id, day] of daily) {
+      if (listed.has(id) || !day.some((v) => v !== null)) continue;
+      rows.push([id, null, null, null, null, null, null, null, null, 0, ...day]);
+    }
   }
   return rows.sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
 }

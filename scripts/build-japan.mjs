@@ -80,5 +80,8 @@ fs.mkdirSync(dir, { recursive: true });
 fs.writeFileSync(path.join(dir, 'cards.json'), japanCardsBody({ built, scraped, shops, rows }));
 fs.writeFileSync(path.join(dir, 'sealed.json'), japanSealedBody({ built, scraped, shops, ja: merged.ja, en: merged.en }));
 const byShop = {};
-for (const r of rows) byShop[r[8]] = (byShop[r[8]] ?? 0) + 1;
+for (const r of rows) {
+  const shop = r[8] ?? "no shop, the day's prices alone";
+  byShop[shop] = (byShop[shop] ?? 0) + 1;
+}
 console.log(`japan/: ${rows.length} printings (${JSON.stringify(byShop)}), ${Object.keys(merged.ja).length} Japanese and ${Object.keys(merged.en).length} English sealed prices, from ${Object.keys(shops).join(' and ')}`);
