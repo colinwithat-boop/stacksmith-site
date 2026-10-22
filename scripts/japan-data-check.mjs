@@ -2,7 +2,7 @@
 //   node scripts/japan-data-check.mjs
 import assert from 'node:assert/strict';
 
-import { dailyPrices, japanCardsBody, japanSealedBody, mergeCardRows, mergeSealed, stockOf } from './japan-data.mjs';
+import { dailyPrices, japanCardsBody, japanSealedBody, mergeCardRows, mergeSealed, outOfLine, stockOf } from './japan-data.mjs';
 
 let passed = 0;
 const check = (name, fn) => {
@@ -48,6 +48,32 @@ check('the cards merge: the cheapest in stock per cell across shops, else the ch
   assert.deepEqual(withDay[0].slice(10), ['0.34', '0.54', null, '0.35', '0.49'], "the file's columns 1 to 5");
   assert.deepEqual(withDay[1].slice(10), [null, null, null, null, null], 'a printing the file lacks');
   assert.equal(withDay[0].length, 15);
+});
+
+check("a yen price out of line with the day's dollars is dropped: the gold Smaug at ¥2,500 against $24,500", () => {
+  assert.equal(outOfLine(2500, 24500), true, 'a 25th of $24,500 is ¥147,000');
+  assert.equal(outOfLine(3500, 17.97), false, 'an $18 card at ¥3,500');
+  assert.equal(outOfLine(30000, 184.1), false, 'a $184 card at ¥30,000');
+  assert.equal(outOfLine(100000, 1), true, 'a $1 card at ¥100,000');
+  assert.equal(outOfLine(500, 0.1), false, 'bulk at ¥500: a card under $1 is never doubted on the high side');
+  assert.equal(outOfLine(30, 2), false, 'a $2 card at ¥30: under $5 never doubted on the low side');
+  assert.equal(outOfLine(2500, null), false, 'no dollars, no doubt');
+  const daily = dailyPrices({ rows: [['smaug', null, '24500.00', null, null, '300.00', null, null], ['fine', '17.97', '20.18', null, null, null, null, null]] });
+  const dropped = [];
+  const rows = mergeCardRows(
+    {
+      bigweb: { rows: [['smaug', null, null, null, null, 2500, null, 3574280, 0], ['fine', 4500, 3500, null, 4000, 3500, null, 195782, 0b011011]] },
+      hareruya: { rows: [['smaug', null, 200000, null, null, null, null, 77, 0]] },
+    },
+    daily,
+    dropped,
+  );
+  const by = Object.fromEntries(rows.map((r) => [r[0], r]));
+  assert.deepEqual(by.smaug.slice(0, 10), ['smaug', null, 200000, null, null, null, null, 77, 'hareruya', 0], "Bigweb's ¥2,500 English foil is gone; Hareruya's ¥200,000 Japanese foil stays");
+  assert.deepEqual(by.fine.slice(1, 7), [4500, 3500, null, 4000, 3500, null], 'a card in line keeps every cell');
+  assert.deepEqual(dropped, [['smaug', 4, 'bigweb', 2500, 24500]]);
+  // The only cell dropped: no row at all, so the app shows no price rather than a wrong one.
+  assert.deepEqual(mergeCardRows({ bigweb: { rows: [['smaug', null, null, null, null, 2500, null, 3574280, 0]] } }, daily), []);
 });
 
 check('the sealed merge: per product and language, in stock first, then price, with the shop', () => {

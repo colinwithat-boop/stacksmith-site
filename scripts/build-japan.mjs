@@ -62,7 +62,15 @@ try {
 } catch (e) {
   console.warn(`::warning::the daily price file could not be read for the Japan merge (${e instanceof Error ? e.message : e}): no dollars or euros on its rows`);
 }
-const rows = mergeCardRows(cards, daily);
+// A shop's cell out of line with the day's dollars (japan-data.mjs
+// outOfLine) is left out: said here, the first few by name, so a wrong
+// band shows in the run's log rather than on phones.
+const dropped = [];
+const rows = mergeCardRows(cards, daily, dropped);
+if (dropped.length > 0) {
+  const shown = dropped.slice(0, 8).map(([id, cell, shop, yen, usd]) => `${id} cell ${cell} ${shop} ¥${yen} against $${usd}`);
+  console.log(`${dropped.length} shop prices out of line with the day's dollars left out: ${shown.join('; ')}${dropped.length > 8 ? '; …' : ''}`);
+}
 const merged = mergeSealed(sealed);
 const built = new Date().toISOString();
 // The newest shop read: the app dates the file by it.

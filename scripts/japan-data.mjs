@@ -35,13 +35,44 @@ export function stockOf(row) {
   return m;
 }
 
+/** Which of the day's dollar columns (usd, usd_foil, usd_etched) a cell's finish answers to: ja, ja_foil, ja_etched, en, en_foil, en_etched. */
+const DOLLAR_FOR_CELL = [0, 1, 2, 0, 1, 2];
+/** A rough yen per dollar: the bands below are wide enough that the rate's drift does not matter. */
+const YEN_PER_DOLLAR = 150;
+/** A yen price under a 25th of the day's dollars, or over 50 times them, is no price of this printing. */
+const LOW_RATIO = 25;
+const HIGH_RATIO = 50;
+/** The dollars under which the bands are not applied: a cheap card's shop price can sit anywhere. */
+const LOW_GUARD_FROM_USD = 5;
+const HIGH_GUARD_FROM_USD = 1;
+
+/**
+ * Whether a shop's yen is out of line with the day's dollars for the
+ * same printing and finish: a listing matched to the wrong printing, or a
+ * placeholder (Bigweb listed a $24,500 gold-foil Smaug at ¥2,500, sold
+ * out, and the merge's "else the cheapest listed" put it on every phone;
+ * the owner, 2026-10-22). The bands are wide: a Japanese shop's price for
+ * a $20 card may run from ¥120 to ¥150,000 before it is doubted, and a
+ * card under $5 is never doubted on the low side (bulk is bulk), one
+ * under $1 never on the high side.
+ */
+export function outOfLine(yen, usd) {
+  if (!(usd > 0) || !(yen > 0)) return false;
+  if (usd >= LOW_GUARD_FROM_USD && yen < (usd * YEN_PER_DOLLAR) / LOW_RATIO) return true;
+  if (usd >= HIGH_GUARD_FROM_USD && yen > usd * YEN_PER_DOLLAR * HIGH_RATIO) return true;
+  return false;
+}
+
 /**
  * The merged rows: `files` maps a shop's name to its parsed cards file
  * ({rows}). Per printing, each cell takes the cheapest in-stock price
  * across the shops, else the cheapest listed; the row's shop and product
- * are the cheapest in-stock cell's shop, else the cheapest cell's.
+ * are the cheapest in-stock cell's shop, else the cheapest cell's. With
+ * the day's prices (`daily`, dailyPrices) a cell out of line with its
+ * dollars (outOfLine) is left out, and noted in `dropped` when given:
+ * [id, cell, shop, yen, usd].
  */
-export function mergeCardRows(files, daily = null) {
+export function mergeCardRows(files, daily = null, dropped = null) {
   const byId = new Map();
   for (const [shop, file] of Object.entries(files)) {
     if (!file || !Array.isArray(file.rows)) continue;
@@ -49,6 +80,7 @@ export function mergeCardRows(files, daily = null) {
       const id = row[0];
       if (typeof id !== 'string' || !id) continue;
       const stock = stockOf(row);
+      const day = daily ? daily.get(id) : null;
       let out = byId.get(id);
       if (!out) {
         out = { cells: new Array(CELLS).fill(null), best: null };
@@ -57,6 +89,11 @@ export function mergeCardRows(files, daily = null) {
       for (let i = 0; i < CELLS; i++) {
         const price = row[1 + i];
         if (typeof price !== 'number' || !(price > 0)) continue;
+        const usd = day ? Number(day[DOLLAR_FOR_CELL[i]]) : NaN;
+        if (Number.isFinite(usd) && outOfLine(price, usd)) {
+          if (dropped) dropped.push([id, i, shop, price, usd]);
+          continue;
+        }
         const inStock = (stock & (1 << i)) !== 0;
         const have = out.cells[i];
         if (!have || (inStock && !have.stock) || (inStock === have.stock && price < have.price)) out.cells[i] = { price, stock: inStock, shop, product: Number(row[7]) || null };
