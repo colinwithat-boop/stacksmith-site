@@ -50,5 +50,62 @@
    "sigs": "pmei.bin",
    "records": 3
   }
+ },
+ "locales": {
+  "en": {
+   "file": "en-5870c7b20fc4487bccc045d44a0becc8d02a1d0dc936fac0717f303b67f7d2b8.json",
+   "version": "5870c7b20fc4487bccc045d44a0becc8d02a1d0dc936fac0717f303b67f7d2b8",
+   "bytes": 2697
+  },
+  "ja": {
+   "file": "ja-f8696fbf1399b8f2172ec727241dd863281532371577c6d317f1e37933f13468.json",
+   "version": "f8696fbf1399b8f2172ec727241dd863281532371577c6d317f1e37933f13468",
+   "bytes": 4374
+  },
+  "de": {
+   "file": "de-cc39cbafe7d8d73505203dc3f31c20db0a4e453e40a4c97842999630c0454c03.json",
+   "version": "cc39cbafe7d8d73505203dc3f31c20db0a4e453e40a4c97842999630c0454c03",
+   "bytes": 4307
+  },
+  "fr": {
+   "file": "fr-71cc4ded617c58fc434bcbe66401b59b73f14a408bdb9544132917229e947215.json",
+   "version": "71cc4ded617c58fc434bcbe66401b59b73f14a408bdb9544132917229e947215",
+   "bytes": 4186
+  },
+  "es": {
+   "file": "es-7bf4b0590a492af73207aa0504feeb847c485474033cca26290ef5e17bd32173.json",
+   "version": "7bf4b0590a492af73207aa0504feeb847c485474033cca26290ef5e17bd32173",
+   "bytes": 3924
+  },
+  "it": {
+   "file": "it-88e3666970eedd88bf55bfeccddfa9fe3783c64a9b4ac11e726897813f659953.json",
+   "version": "88e3666970eedd88bf55bfeccddfa9fe3783c64a9b4ac11e726897813f659953",
+   "bytes": 4028
+  },
+  "pt": {
+   "file": "pt-72ab0ad4a64e148709b10ebdc6de987a295b55d4d79e992d0e6a178446f56ae5.json",
+   "version": "72ab0ad4a64e148709b10ebdc6de987a295b55d4d79e992d0e6a178446f56ae5",
+   "bytes": 3722
+  },
+  "zhs": {
+   "file": "zhs-b3d92111c213f66a73a210a2365ff4c4af262b8cd6302215168ff8e952406ca2.json",
+   "version": "b3d92111c213f66a73a210a2365ff4c4af262b8cd6302215168ff8e952406ca2",
+   "bytes": 165
+  },
+  "zht": {
+   "file": "zht-9d59a95f1c6e364c6194581f677a73351604f79b9efc3d058e70dafd7cf1c9e9.json",
+   "version": "9d59a95f1c6e364c6194581f677a73351604f79b9efc3d058e70dafd7cf1c9e9",
+   "bytes": 165
+  },
+  "ko": {
+   "file": "ko-dbc6ad43a5d9d835327ad2cc642c5d21bbff42f6ec09fd786dff37ded53f35e4.json",
+   "version": "dbc6ad43a5d9d835327ad2cc642c5d21bbff42f6ec09fd786dff37ded53f35e4",
+   "bytes": 164
+  },
+  "ru": {
+   "file": "ru-36f0773ddf6e5d4e90fed872f9fb81236de102873c73a3f8bbb668fa93b16cac.json",
+   "version": "36f0773ddf6e5d4e90fed872f9fb81236de102873c73a3f8bbb668fa93b16cac",
+   "bytes": 164
+  }
  }
 }
