@@ -27,7 +27,7 @@
 <body>
 <main>
   <h1>Stacksmith privacy policy</h1>
-  <p class="date">Last updated: 16 October 2026</p>
+  <p class="date">Last updated: 22 October 2026</p>
 
   <p>Stacksmith is a Magic: The Gathering card scanner and collection tracker. It has no accounts and no server of its own. This page explains what the app keeps on your phone, what it sends over the internet, and when.</p>
 
@@ -40,6 +40,8 @@
   </ul>
 
   <h2>What the app sends over the internet, and when</h2>
+  <p><strong>Expo EAS Update</strong> (u.expo.dev and Expo's asset servers): on app launch, checks for compatible app fixes and downloads their code and images. Requests include the operating-system platform, app runtime version, update channel, update identifiers, and a per-installation EAS client identifier. They also include update failure information, including an error message after a fatal update failure. Expo receives your IP address. Your collection and camera frames are not uploaded for app updates. A downloaded update takes effect on a later app restart.</p>
+  <p><strong>Feedback</strong>: Send feedback in Settings opens our feedback page in your browser with Japanese or English selected to match the app. No collection or device details are added to the link. The page sends the feedback and screenshots you choose to submit. The crash screen's Contact support opens an email draft, which is sent only when you send it.</p>
   <p>Every internet request carries standard connection information, such as your IP address. Beyond that, the app sends only what is listed here.</p>
   <ul>
     <li><strong>Scryfall</strong> (scryfall.com): card data, set lists, card images, prices (TCGplayer's and Cardmarket's) and format legality. The Home tab's upcoming sets come from a file on Cloudflare Pages (below): the app asks Scryfall for Home's set list only when that file cannot be had. With TCGplayer Market or Cardmarket prices, day-to-day prices come from the price file on Cloudflare Pages (below), and the app asks Scryfall for prices only when you tap Refresh prices in Settings, or when that file could not be fetched for more than two days, or has not been fetched yet since you changed the price source, installed an app update with new card data or restored a backup (then it asks about the printings you own, until the file comes). With TCGplayer Low or Mid, it also asks Scryfall about each printing the first time it prices it, to find it on TCGplayer. After that it asks each day, and when you scan, add or open a card, about the printings it cannot price from TCGplayer's price lists (below). For all of this, and for the format legality of a card the weekly card facts file (below) does not have yet, when you own it or open it in a card or a deck, it sends Scryfall the IDs of the cards and printings concerned; it does not send quantities, folders or anything else about you. With Market or Cardmarket prices, scanning a card sends nothing. New card data is downloaded when you choose to: from Cloudflare Pages (below) for the sets published there, otherwise from Scryfall.</li>
@@ -64,7 +66,8 @@
         <li>On an iPhone, Vision is part of iOS and the app sends nothing for it.</li>
       </ul>
     </li>
-    <li><strong>Links you tap</strong> (to Scryfall, TCGplayer, Cardmarket, MTGGoldfish, Hareruya, Bigweb, Rakuten, Yahoo! Shopping, Cards Realm, Archidekt, Commander Spellbook or Wizards' Secret Lair store) open in your browser. A "Buy" choice offers TCGplayer, Cardmarket, Hareruya and Bigweb; "Buy missing" puts the list of cards you are missing (from a deck, or from a set in your inventory) into the TCGplayer link it opens, and the wishlist's "Buy" puts the cards on your wishlist (names and counts) into it.</li>
+    <li><strong>Updated card translations</strong> are downloaded from the app’s Cloudflare Pages site on launch, on returning to the app, and after adding new card data. English keyword data and Japanese names, rules text, type lines and picture references are kept current, along with your app language and installed card languages. Automatic downloads and writes wait until scanning is out of view. Requests identify the bundled database version, the requested language and the file version, and reveal your IP address. No collection, card names, quantities or other personal data are sent.</li>
+    <li><strong>Links you tap</strong> (to Scryfall, TCGplayer, Cardmarket, MTGGoldfish, Hareruya, Bigweb, Rakuten, Yahoo! Shopping, Cards Realm, Archidekt, Commander Spellbook or Wizards' Secret Lair store) open in your browser. A "Buy" choice offers TCGplayer, Cardmarket, Hareruya and Bigweb; "Buy missing" puts the list of cards you are missing (from a deck, or from a set in your inventory) into the TCGplayer link it opens, and the wishlist's "Buy" puts the cards on your wishlist (names and counts) into it. Choosing Hareruya for a list copies the card names and counts to your system clipboard. The app does not read your clipboard. It opens Hareruya’s bulk-buy page when you choose Open shop; Hareruya receives the list when you paste it into that page and submit it.</li>
     <li><strong>Google Play or the App Store</strong>: to process the optional one-time Pro purchase and to check whether it has been made. Google or Apple handles the payment under its own privacy policy; the app never sees your payment details.</li>
   </ul>
   <p>Each of those services has its own privacy policy.</p>
