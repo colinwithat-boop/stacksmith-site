@@ -407,10 +407,13 @@ document.getElementById('again').addEventListener('click', function (e) {
   document.getElementById('text').focus();
 });
 
-// Japanese for a Japanese browser, English otherwise; the toggle is remembered.
+// An app link picks its language before the saved toggle or browser language.
+// Only known values can override the normal browser defaults.
+var linkedLanguage = new URLSearchParams(window.location.search).get('lang');
 var saved = null;
 try { saved = localStorage.getItem('lang'); } catch (e) {}
-applyLanguage(saved || ((navigator.language || '').toLowerCase().indexOf('ja') === 0 ? 'ja' : 'en'));
+applyLanguage((linkedLanguage === 'ja' || linkedLanguage === 'en') ? linkedLanguage :
+  ((saved === 'ja' || saved === 'en') ? saved : ((navigator.language || '').toLowerCase().indexOf('ja') === 0 ? 'ja' : 'en')));
 </script>
 </body>
 </html>
