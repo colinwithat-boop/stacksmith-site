@@ -3,20 +3,12 @@
  "db": "cards-v13.db",
  "sets": {
   "trk": {
-   "count": 181,
+   "count": 195,
    "bundleCount": 135,
-   "scryfallCount": 316,
+   "scryfallCount": 342,
    "cards": "trk.json",
    "sigs": "trk.bin",
-   "records": 181
-  },
-  "sds": {
-   "count": 4,
-   "bundleCount": 1,
-   "scryfallCount": 5,
-   "cards": "sds.json",
-   "sigs": "sds.bin",
-   "records": 4
+   "records": 195
   },
   "trc": {
    "count": 26,
@@ -25,6 +17,14 @@
    "cards": "trc.json",
    "sigs": "trc.bin",
    "records": 26
+  },
+  "sds": {
+   "count": 4,
+   "bundleCount": 1,
+   "scryfallCount": 5,
+   "cards": "sds.json",
+   "sigs": "sds.bin",
+   "records": 4
   },
   "pspl": {
    "count": 1,
