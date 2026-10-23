@@ -2,14 +2,6 @@
  "v": 1,
  "db": "cards-v13.db",
  "sets": {
-  "trk": {
-   "count": 195,
-   "bundleCount": 135,
-   "scryfallCount": 342,
-   "cards": "trk.json",
-   "sigs": "trk.bin",
-   "records": 195
-  },
   "trc": {
    "count": 26,
    "bundleCount": 41,
@@ -25,6 +17,14 @@
    "cards": "sds.json",
    "sigs": "sds.bin",
    "records": 4
+  },
+  "trk": {
+   "count": 248,
+   "bundleCount": 135,
+   "scryfallCount": 368,
+   "cards": "trk.json",
+   "sigs": "trk.bin",
+   "records": 248
   },
   "pspl": {
    "count": 1,
