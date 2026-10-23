@@ -7,6 +7,7 @@
 //
 //   node scripts/hareruya-data-check.mjs
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 
 import {
   buildScryfallIndex,
@@ -157,6 +158,64 @@ check('what does not match says why', () => {
   assert.equal(matchSingle(parseSingleName('(999)《森/Forest》[LEA] 土地C'), 'Forest', index).why, 'number not in set');
   assert.equal(matchSingle(parseSingleName('《森/Forest》[LEA] 土地C'), 'Forest', index).why, 'several printings, no number');
   assert.equal(matchSingle(parseSingleName('《稲妻/Lightning Bolt》[FRA] 赤C'), 'Lightning Bolt', index).why, 'name not in set');
+});
+
+const feedback = JSON.parse(readFileSync(new URL('./fixtures/hareruya-feedback-2026-10-23.json', import.meta.url), 'utf8'));
+const feedbackIndex = buildScryfallIndex(feedback.printings);
+
+check('feedback #19: regular WAR, alternate artwork and both prerelease artworks keep their own prices', () => {
+  const docs = feedback.listings.filter((d) => d.card_name === 'Nicol Bolas, Dragon-God').map((d) => {
+    const parsed = parseSingleName(d.product_name);
+    const match = matchSingle(parsed, d.card_name, feedbackIndex);
+    assert.equal(match.id, d.expected, `product ${d.product}`);
+    return { ...d, parsed, id: match.id };
+  });
+  const cells = pickPrices(docs);
+  assert.equal(cells.get('98b68dea-a7be-4f99-8a50-4c8cf0e0f7a9|ja|foil').price, 1500);
+  // The in-stock partial-gloss foil wins within the alternate artwork;
+  // its price can never flow into the regular artwork's cell.
+  assert.equal(cells.get('c4a5770e-533d-479f-b469-1fbef08614c1|ja|foil').price, 12000);
+  assert.equal(cells.get('68504179-5d31-4cbd-8562-fba8d3013baa|en|foil').price, 3500);
+  assert.equal(cells.get('f1c8a552-eca4-477d-8f78-edaa9dfb9a9d|ja|foil').price, 16000);
+  assert.equal(cells.get('43f7dad3-fd67-4a6b-8daa-dbda75d995c5|ja|foil').price, 1000);
+});
+
+check('an absent WAR artwork or promo kind never borrows the remaining version', () => {
+  for (const product of ['72503', '72539', '72562', '142956']) {
+    const d = feedback.listings.find((d) => d.product === product);
+    const missing = buildScryfallIndex(feedback.printings.filter((c) => c.id !== d.expected));
+    assert.equal(matchSingle(parseSingleName(d.product_name), d.card_name, missing).id, null, product);
+  }
+  const plain = feedback.listings[0];
+  const artOnly = buildScryfallIndex(feedback.printings.filter((c) => c.id !== plain.expected));
+  assert.equal(matchSingle(parseSingleName(plain.product_name), plain.card_name, artOnly).id, null);
+  // A numbered generic prerelease must use s, never the promo-pack p.
+  const promos = buildScryfallIndex([
+    { id: 'pack', set: 'pone', collector_number: '10p', name: 'Elesh Norn, Mother of Machines' },
+    { id: 'release', set: 'pone', collector_number: '10s', name: 'Elesh Norn, Mother of Machines' },
+  ]);
+  const parsed = parseSingleName('【Foil】(010)■プレリリース■《Elesh Norn, Mother of Machines》[ONE-PRE]');
+  assert.equal(matchSingle(parsed, 'Elesh Norn, Mother of Machines', promos).id, 'release');
+  const packOnly = buildScryfallIndex([promos.byNumber.get('pone|10p')]);
+  assert.equal(matchSingle(parsed, 'Elesh Norn, Mother of Machines', packOnly).id, null);
+});
+
+check('feedback #12: explicit Spotlight Series event prices the pictured Cloud #4 in each finish and language', () => {
+  const docs = feedback.listings.filter((d) => d.card_name === 'Cloud, Midgar Mercenary').map((d) => {
+    const parsed = parseSingleName(d.product_name);
+    const match = matchSingle(parsed, d.card_name, feedbackIndex);
+    assert.equal(parsed.code, 'PSPL');
+    assert.equal(match.id, d.expected, `product ${d.product}, language ${d.language}`);
+    return { ...d, parsed, id: match.id };
+  });
+  assert.deepEqual(cardRows(pickPrices(docs)), [
+    ['32e03ed1-6d1e-4303-b67c-4a5a4f825e9c', 120000, 1000000, null, 450000, 4000000, null, 180032, 1],
+  ]);
+  const other = parseSingleName('【Foil】《Cloud, Midgar Mercenary》(統率者デッキプロモ)[流星マーク]');
+  assert.equal(other.code, '流星マーク');
+  assert.equal(matchSingle(other, 'Cloud, Midgar Mercenary', feedbackIndex).id, null);
+  const unnamed = parseSingleName('【Foil】《Cloud, Midgar Mercenary》[流星マーク]');
+  assert.equal(matchSingle(unnamed, 'Cloud, Midgar Mercenary', feedbackIndex).id, null);
 });
 
 check('the Scryfall summary keeps paper cards and marks special printings', () => {

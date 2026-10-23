@@ -173,7 +173,11 @@ export function parseSingleName(name) {
   });
   // The set code: the last [..] group before the colour and rarity.
   const codes = [...s.matchAll(/\[([^\]]+)\]/g)].map((m) => m[1].trim()).filter(Boolean);
-  const code = codes.length ? codes[codes.length - 1] : null;
+  let code = codes.length ? codes[codes.length - 1] : null;
+  // The shooting-star mark is shared by unrelated promo programs. Only
+  // the explicit event name identifies Spotlight Series (feedback #12,
+  // Cloud #4); never map every [流星マーク] listing to that set.
+  if ((code === '流星マーク' || code === 'その他プロモ') && /\(スポットライトシリーズプロモ\)/.test(s)) code = 'PSPL';
   // The names: every 《ja/en》, the English after the last '/'.
   const faces = [...s.matchAll(/《([^》]*)》/g)].map((m) => m[1]);
   const english = faces.map((f) => {
@@ -218,13 +222,29 @@ export function matchSingle(parsed, cardName, index, hareruyaSet = '') {
   const token = parsed.english.some((n) => /\b(Token|Emblem)\b/i.test(n));
   const inSet = token && index.sets.has(`t${set}`) ? `t${set}` : set;
   if (!index.sets.has(inSet)) return { id: null, why: `unknown set ${parsed.code}` };
+  const promo = isPromoCode(parsed.code);
+  const prerelease = parsed.frames.some((f) => /プレリリース/.test(f)) || /-PRE$/i.test(String(parsed.code ?? ''));
+  const strictPromo = prerelease || /^Pスタンプ_/i.test(String(parsed.code ?? '')) || parsed.frames.some((f) => /プロモスタンプ/.test(f));
+  // WAR reuses each number for its regular and Japanese artwork; only
+  // Scryfall adds ★. Hareruya's WAR-ART / 絵違い must choose that number
+  // before any plain-number lookup, or its expensive foils price the
+  // regular artwork (#19). Apply the same distinction to prereleases.
+  const war = inSet === 'war' || inSet === 'pwar';
+  const warArt = war && (/-ART$/i.test(String(parsed.code ?? '')) || parsed.frames.some((f) => /絵違い|日本画/.test(f)) || String(parsed.number ?? '').includes('★'));
+  const matchingKind = (h) =>
+    (!war || String(h.collector_number).includes('★') === warArt) &&
+    (!promo || new RegExp(`${prerelease ? 's' : 'p'}${warArt ? '★' : ''}$`).test(String(h.collector_number)));
   if (parsed.number !== null) {
     const number = normalizeNumber(token ? parsed.number.split('/')[0] : parsed.number);
     // A promo set numbers a promo-pack card "<n>p" and a prerelease card
     // "<n>s"; Scryfall numbers a Japanese-art alternate, a surge or galaxy
     // foil "<n>★" where Hareruya does not.
-    const promo = isPromoCode(parsed.code);
-    const tries = promo ? [`${number}p`, `${number}s`, number] : [number, `${number}★`];
+    const bare = number.replace(/[ps]?★?$/, '');
+    const tries = war
+      ? [`${bare}${promo ? (prerelease ? 's' : 'p') : ''}${warArt ? '★' : ''}`]
+      : promo
+        ? [...new Set([`${bare}${prerelease ? 's' : 'p'}`, ...(strictPromo ? [] : [number])])]
+        : [number, `${number}★`];
     let numbered = null;
     for (const t of tries) {
       const hit = index.byNumber.get(`${inSet}|${t}`);
@@ -235,32 +255,32 @@ export function matchSingle(parsed, cardName, index, hareruyaSet = '') {
     }
     // A promo-pack card the base set carries under its own number ("432"
     // in the set, not "432p" in its promo set).
-    if (!numbered && promo) {
+    if (!numbered && promo && !strictPromo && !war) {
       const baseSet = normalizeSetCode(String(parsed.code).replace(/-(P|PRE)$/i, ''));
       if (index.sets.has(baseSet)) numbered = index.byNumber.get(`${baseSet}|${number}`) ?? null;
     }
     // The number is trusted only when the names agree: Hareruya's numbering
     // of a few sets (Secret Lair's biggest drops, some Universes Beyond
     // sets) is not Scryfall's, and a number alone would price another card.
-    if (numbered && namesAgree(parsed, cardName, numbered)) return { id: numbered.id, why: null };
+    if (numbered && (!war || matchingKind(numbered)) && namesAgree(parsed, cardName, numbered)) return { id: numbered.id, why: null };
   }
   const names = [cardName, ...parsed.english].filter(Boolean);
-  const prerelease = parsed.frames.some((f) => /プレリリース/.test(f)) || /-PRE$/i.test(String(parsed.code ?? ''));
   for (const n of names) {
     const hits = index.byName.get(`${inSet}|${nameKey(n)}`);
     if (!hits) continue;
-    if (hits.length === 1) return { id: hits[0].id, why: null };
+    // Filter the requested kind even when there is only one name match:
+    // an absent prerelease/art variant must not borrow another version.
+    let left = hits.filter(matchingKind);
+    if (left.length === 1) return { id: left[0].id, why: null };
     // Several printings of the name in the set, and no number to tell them
     // apart: in a promo set, the prerelease ("<n>s") or promo-pack ("<n>p")
     // one; the retro-framed one when the name says 旧枠 (30th Anniversary
     // Edition, which has both frames), else the plain one: not a '★'
     // printing (the sample decks' copies in 7th to 10th Edition), not a
     // frame effect, promo or variant.
-    let left = hits;
-    if (isPromoCode(parsed.code)) left = left.filter((h) => new RegExp(prerelease ? 's$' : 'p$').test(String(h.collector_number)));
     const retro = parsed.frames.some((f) => /旧枠/.test(f));
     if (left.some((h) => h.retro) && left.some((h) => !h.retro)) left = left.filter((h) => Boolean(h.retro) === retro);
-    if (left.length > 1) left = left.filter((h) => !String(h.collector_number).includes('★'));
+    if (left.length > 1 && !warArt) left = left.filter((h) => !String(h.collector_number).includes('★'));
     if (left.length > 1 && parsed.frames.length === 0) left = left.filter((h) => !h.special);
     if (left.length === 1) return { id: left[0].id, why: null };
     return { id: null, why: parsed.number === null ? 'several printings, no number' : 'number not in set' };

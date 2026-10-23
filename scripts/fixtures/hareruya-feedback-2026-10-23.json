@@ -1,0 +1,24 @@
+{
+  "source": "Hareruya public product search, 2026-10-23; issues scansmith#19 and scansmith#12",
+  "printings": [
+    { "id": "98b68dea-a7be-4f99-8a50-4c8cf0e0f7a9", "set": "war", "collector_number": "207", "name": "Nicol Bolas, Dragon-God", "faces": [], "special": false },
+    { "id": "c4a5770e-533d-479f-b469-1fbef08614c1", "set": "war", "collector_number": "207★", "name": "Nicol Bolas, Dragon-God", "faces": [], "special": true },
+    { "id": "43f7dad3-fd67-4a6b-8daa-dbda75d995c5", "set": "pwar", "collector_number": "207p", "name": "Nicol Bolas, Dragon-God", "faces": [], "special": true },
+    { "id": "68504179-5d31-4cbd-8562-fba8d3013baa", "set": "pwar", "collector_number": "207s", "name": "Nicol Bolas, Dragon-God", "faces": [], "special": true },
+    { "id": "f1c8a552-eca4-477d-8f78-edaa9dfb9a9d", "set": "pwar", "collector_number": "207s★", "name": "Nicol Bolas, Dragon-God", "faces": [], "special": true },
+    { "id": "32e03ed1-6d1e-4303-b67c-4a5a4f825e9c", "set": "pspl", "collector_number": "4", "name": "Cloud, Midgar Mercenary", "faces": [], "special": true },
+    { "id": "570ca3e8-1563-4cef-8559-776982a78838", "set": "ppro", "collector_number": "2025-1", "name": "Cloud, Midgar Mercenary", "faces": [], "special": true }
+  ],
+  "listings": [
+    { "product": "72277", "product_name": "【Foil】(207)《龍神、ニコル・ボーラス/Nicol Bolas, Dragon-God》[WAR] 金R", "card_name": "Nicol Bolas, Dragon-God", "language": "1", "card_condition": "1", "price": "1500", "stock": "0", "expected": "98b68dea-a7be-4f99-8a50-4c8cf0e0f7a9" },
+    { "product": "72503", "product_name": "【Foil】(207)■絵違い■《龍神、ニコル・ボーラス/Nicol Bolas, Dragon-God》※部分光沢[WAR-ART] 金R", "card_name": "Nicol Bolas, Dragon-God", "language": "1", "card_condition": "1", "price": "12000", "stock": "630", "expected": "c4a5770e-533d-479f-b469-1fbef08614c1" },
+    { "product": "87926", "product_name": "【Foil】(207)■絵違い■《龍神、ニコル・ボーラス/Nicol Bolas, Dragon-God》※全面光沢[WAR-ART] 金R", "card_name": "Nicol Bolas, Dragon-God", "language": "1", "card_condition": "1", "price": "9000", "stock": "0", "expected": "c4a5770e-533d-479f-b469-1fbef08614c1" },
+    { "product": "72539", "product_name": "【Foil】(207)■絵違い：プレリリース■《龍神、ニコル・ボーラス/Nicol Bolas, Dragon-God》[WAR-PRE] 金R", "card_name": "Nicol Bolas, Dragon-God", "language": "1", "card_condition": "1", "price": "16000", "stock": "0", "expected": "f1c8a552-eca4-477d-8f78-edaa9dfb9a9d" },
+    { "product": "72562", "product_name": "【Foil】(207)■プレリリース■《龍神、ニコル・ボーラス/Nicol Bolas, Dragon-God》[WAR-PRE] 金R", "card_name": "Nicol Bolas, Dragon-God", "language": "2", "card_condition": "1", "price": "3500", "stock": "0", "expected": "68504179-5d31-4cbd-8562-fba8d3013baa" },
+    { "product": "142956", "product_name": "【Foil】(207)■プロモスタンプ付■《龍神、ニコル・ボーラス/Nicol Bolas, Dragon-God》[Pスタンプ_WAR] 金R", "card_name": "Nicol Bolas, Dragon-God", "language": "1", "card_condition": "1", "price": "1000", "stock": "0", "expected": "43f7dad3-fd67-4a6b-8daa-dbda75d995c5" },
+    { "product": "180032", "product_name": "■ボーダーレス■《ミッドガルの傭兵、クラウド/Cloud, Midgar Mercenary》(スポットライトシリーズプロモ)[流星マーク] 白", "card_name": "Cloud, Midgar Mercenary", "language": "1", "card_condition": "1", "price": "120000", "stock": "252", "expected": "32e03ed1-6d1e-4303-b67c-4a5a4f825e9c" },
+    { "product": "180032", "product_name": "■ボーダーレス■《ミッドガルの傭兵、クラウド/Cloud, Midgar Mercenary》(スポットライトシリーズプロモ)[流星マーク] 白", "card_name": "Cloud, Midgar Mercenary", "language": "2", "card_condition": "1", "price": "450000", "stock": "0", "expected": "32e03ed1-6d1e-4303-b67c-4a5a4f825e9c" },
+    { "product": "180046", "product_name": "【Foil】■ボーダーレス■《ミッドガルの傭兵、クラウド/Cloud, Midgar Mercenary》(スポットライトシリーズプロモ)[流星マーク] 白", "card_name": "Cloud, Midgar Mercenary", "language": "1", "card_condition": "1", "price": "1000000", "stock": "0", "expected": "32e03ed1-6d1e-4303-b67c-4a5a4f825e9c" },
+    { "product": "180046", "product_name": "【Foil】■ボーダーレス■《ミッドガルの傭兵、クラウド/Cloud, Midgar Mercenary》(スポットライトシリーズプロモ)[流星マーク] 白", "card_name": "Cloud, Midgar Mercenary", "language": "2", "card_condition": "1", "price": "4000000", "stock": "0", "expected": "32e03ed1-6d1e-4303-b67c-4a5a4f825e9c" }
+  ]
+}
