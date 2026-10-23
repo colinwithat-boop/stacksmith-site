@@ -151,16 +151,18 @@ export async function onRequestPost({ request, env }) {
   const screen = Object.hasOwn(SCREENS, screenKey) ? SCREENS[screenKey] : null;
   const device = field(body, 'device', MAX_SHORT);
   const version = field(body, 'version', MAX_SHORT);
-  // Only an email address is kept (the owner, 2026-10-21: no X handles), and
-  // only when it looks like one; anything else is dropped.
+  // Optional contact details; a handle opts into a public implementation mention.
   const emailGiven = field(body, 'email', MAX_SHORT);
   const email = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailGiven) ? emailGiven : '';
+  const twitterGiven = field(body, 'twitter', MAX_SHORT).replace(/^@/, '');
+  if (twitterGiven && !/^[A-Za-z0-9_]{1,15}$/.test(twitterGiven)) return json({ error: 'invalid_twitter' }, 400, headers);
+  const twitter = twitterGiven ? `@${twitterGiven}` : '';
   const agent = (request.headers.get('User-Agent') || '').slice(0, MAX_SHORT);
   const images = readImages(body.images);
   const received = `${new Date().toISOString().replace('T', ' ').slice(0, 16)} UTC`;
 
   const translated = await translate(env, text);
-  const report = { type, screen, device, version, email, agent, text, translated, images, received };
+  const report = { type, screen, device, version, email, twitter, agent, text, translated, images, received };
   const issue = await createIssue(env, report);
   const message = buildEmail(report, issue);
   const sent = await sendEmail(env, message, email, images);
@@ -232,7 +234,7 @@ async function createIssue(env, report) {
   const token = (env.FEEDBACK_ISSUES_TOKEN || '').trim();
   const repo = (env.FEEDBACK_ISSUES_REPO || '').trim().replace(/^https?:\/\/github\.com\//, '').replace(/\/+$/, '');
   if (!token || !repo) return null;
-  const { type, screen, device, version, email, images, received } = report;
+  const { type, screen, device, version, email, twitter, images, received } = report;
   const facts = [
     `**Type:** ${type.en}`,
     screen ? `**Screen:** ${screen.en}` : null,
@@ -243,6 +245,7 @@ async function createIssue(env, report) {
     `**Received:** ${received}`,
     images.length ? `**Photos:** ${images.length}, attached to the email` : null,
     email ? '**Reply:** the reporter left an email address (in the email)' : null,
+    twitter ? `**Twitter/X:** https://x.com/${twitter.slice(1)} — opted into a public @mention when implemented` : null,
   ].filter(Boolean).join(' · ');
   const bodyLines = [facts, extras, '', ...bothLanguages(report, (h) => `### ${h}`), '', '_Sent from the feedback page._'];
   const labels = ['feedback'];
@@ -275,7 +278,7 @@ async function createIssue(env, report) {
 }
 
 function buildEmail(report, issue) {
-  const { type, screen, device, version, email, agent, images, received } = report;
+  const { type, screen, device, version, email, twitter, agent, images, received } = report;
   const subject = `[Stacksmith] ${type.en}${screen ? ` · ${screen.en}` : ''}: ${headline(report)}`;
   const lines = [
     issue && issue.url ? `Issue: ${issue.url}` : null,
@@ -285,6 +288,7 @@ function buildEmail(report, issue) {
     device ? `Device / 端末: ${device}` : null,
     version ? `App version / バージョン: ${version}` : null,
     email ? `Email / メール: ${email}` : null,
+    twitter ? `Twitter/X: ${twitter} — public implementation @mention requested / 実装・修正のお知らせでの公開メンションを希望` : null,
     images.length ? `Photos / 写真: ${images.length} (attached / 添付)` : null,
     `Received / 受信: ${received}`,
     agent ? `Browser: ${agent}` : null,
