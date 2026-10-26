@@ -2,13 +2,13 @@
  "v": 1,
  "db": "cards-v13.db",
  "sets": {
-  "trc": {
-   "count": 26,
-   "bundleCount": 41,
-   "scryfallCount": 67,
-   "cards": "trc.json",
-   "sigs": "trc.bin",
-   "records": 26
+  "pw27": {
+   "count": 1,
+   "bundleCount": 0,
+   "scryfallCount": 1,
+   "cards": "pw27.json",
+   "sigs": "pw27.bin",
+   "records": 1
   },
   "sds": {
    "count": 4,
@@ -18,13 +18,21 @@
    "sigs": "sds.bin",
    "records": 4
   },
+  "trc": {
+   "count": 27,
+   "bundleCount": 41,
+   "scryfallCount": 68,
+   "cards": "trc.json",
+   "sigs": "trc.bin",
+   "records": 27
+  },
   "trk": {
-   "count": 264,
+   "count": 273,
    "bundleCount": 135,
    "scryfallCount": 407,
    "cards": "trk.json",
    "sigs": "trk.bin",
-   "records": 264
+   "records": 273
   },
   "pspl": {
    "count": 1,
@@ -43,12 +51,12 @@
    "records": 30
   },
   "sld": {
-   "count": 4,
+   "count": 6,
    "bundleCount": 2843,
-   "scryfallCount": 2848,
+   "scryfallCount": 2849,
    "cards": "sld.json",
    "sigs": "sld.bin",
-   "records": 4
+   "records": 6
   },
   "pmei": {
    "count": 3,
