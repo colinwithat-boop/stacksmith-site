@@ -18,21 +18,21 @@
    "sigs": "sds.bin",
    "records": 4
   },
-  "trc": {
-   "count": 27,
-   "bundleCount": 41,
-   "scryfallCount": 68,
-   "cards": "trc.json",
-   "sigs": "trc.bin",
-   "records": 27
-  },
   "trk": {
-   "count": 273,
+   "count": 314,
    "bundleCount": 135,
-   "scryfallCount": 407,
+   "scryfallCount": 457,
    "cards": "trk.json",
    "sigs": "trk.bin",
-   "records": 273
+   "records": 314
+  },
+  "trc": {
+   "count": 111,
+   "bundleCount": 41,
+   "scryfallCount": 152,
+   "cards": "trc.json",
+   "sigs": "trc.bin",
+   "records": 111
   },
   "pspl": {
    "count": 1,
