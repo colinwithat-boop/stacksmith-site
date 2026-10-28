@@ -11,28 +11,28 @@
    "records": 1
   },
   "sds": {
-   "count": 4,
+   "count": 29,
    "bundleCount": 1,
    "scryfallCount": 5,
    "cards": "sds.json",
    "sigs": "sds.bin",
-   "records": 4
-  },
-  "trk": {
-   "count": 314,
-   "bundleCount": 135,
-   "scryfallCount": 457,
-   "cards": "trk.json",
-   "sigs": "trk.bin",
-   "records": 314
+   "records": 29
   },
   "trc": {
-   "count": 111,
+   "count": 233,
    "bundleCount": 41,
-   "scryfallCount": 152,
+   "scryfallCount": 274,
    "cards": "trc.json",
    "sigs": "trc.bin",
-   "records": 111
+   "records": 233
+  },
+  "trk": {
+   "count": 354,
+   "bundleCount": 135,
+   "scryfallCount": 483,
+   "cards": "trk.json",
+   "sigs": "trk.bin",
+   "records": 354
   },
   "pspl": {
    "count": 1,
@@ -50,13 +50,21 @@
    "sigs": "slc.bin",
    "records": 30
   },
+  "plst": {
+   "count": 1,
+   "bundleCount": 5740,
+   "scryfallCount": 5741,
+   "cards": "plst.json",
+   "sigs": "plst.bin",
+   "records": 1
+  },
   "sld": {
-   "count": 6,
+   "count": 22,
    "bundleCount": 2843,
-   "scryfallCount": 2849,
+   "scryfallCount": 2865,
    "cards": "sld.json",
    "sigs": "sld.bin",
-   "records": 6
+   "records": 22
   },
   "pmei": {
    "count": 3,
@@ -74,9 +82,9 @@
    "bytes": 2697
   },
   "ja": {
-   "file": "ja-f8696fbf1399b8f2172ec727241dd863281532371577c6d317f1e37933f13468.json",
-   "version": "f8696fbf1399b8f2172ec727241dd863281532371577c6d317f1e37933f13468",
-   "bytes": 4374
+   "file": "ja-8f8c5fa79ef902cee7a5259bd4683168c64c70cc19f435ff42d1b64261fbe246.json",
+   "version": "8f8c5fa79ef902cee7a5259bd4683168c64c70cc19f435ff42d1b64261fbe246",
+   "bytes": 5560
   },
   "de": {
    "file": "de-cc39cbafe7d8d73505203dc3f31c20db0a4e453e40a4c97842999630c0454c03.json",
