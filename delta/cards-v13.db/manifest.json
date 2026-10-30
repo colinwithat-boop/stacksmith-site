@@ -10,13 +10,21 @@
    "sigs": "pw27.bin",
    "records": 1
   },
+  "trc": {
+   "count": 465,
+   "bundleCount": 41,
+   "scryfallCount": 506,
+   "cards": "trc.json",
+   "sigs": "trc.bin",
+   "records": 465
+  },
   "trk": {
-   "count": 395,
+   "count": 422,
    "bundleCount": 135,
-   "scryfallCount": 530,
+   "scryfallCount": 557,
    "cards": "trk.json",
    "sigs": "trk.bin",
-   "records": 395
+   "records": 422
   },
   "sds": {
    "count": 29,
@@ -25,14 +33,6 @@
    "cards": "sds.json",
    "sigs": "sds.bin",
    "records": 29
-  },
-  "trc": {
-   "count": 401,
-   "bundleCount": 41,
-   "scryfallCount": 395,
-   "cards": "trc.json",
-   "sigs": "trc.bin",
-   "records": 401
   },
   "pw26": {
    "count": 1,
@@ -93,9 +93,9 @@
  },
  "locales": {
   "en": {
-   "file": "en-5870c7b20fc4487bccc045d44a0becc8d02a1d0dc936fac0717f303b67f7d2b8.json",
-   "version": "5870c7b20fc4487bccc045d44a0becc8d02a1d0dc936fac0717f303b67f7d2b8",
-   "bytes": 2697
+   "file": "en-4d136e0a9d0f0e13b0ed7054f228f6f0fd26bd292ee97e8ee0787e95b07cb4f2.json",
+   "version": "4d136e0a9d0f0e13b0ed7054f228f6f0fd26bd292ee97e8ee0787e95b07cb4f2",
+   "bytes": 2719
   },
   "ja": {
    "file": "ja-8f8c5fa79ef902cee7a5259bd4683168c64c70cc19f435ff42d1b64261fbe246.json",
