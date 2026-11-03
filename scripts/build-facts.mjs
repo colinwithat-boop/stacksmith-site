@@ -1,6 +1,6 @@
 // Builds facts/latest.json, the Stacksmith app's card facts: per card
-// (oracle id), its legality in the app's formats, its colour identity and
-// Scryfall's Game Changer flag, from Scryfall's oracle_cards bulk data
+// (oracle id), its legality in the app's formats, its colour identity,
+// Scryfall's Game Changer flag and its EDHREC rank, from Scryfall's oracle_cards bulk data
 // (one object per card, ~25 MB gzipped JSONL). The app reads it about once
 // a week into its card_legalities table (lib/cardData/facts.ts in the app
 // repo), so it no longer asks Scryfall card by card. The prices workflow
@@ -8,12 +8,16 @@
 //
 //   node scripts/build-facts.mjs [--out _site/facts/latest.json]
 //
-// Row: [oracle id, legality, identity, game changer], where legality is one
-// letter per format in `formats` order (L legal, N not legal, B banned, R
-// restricted, - not listed), identity is WUBRG letters in that order ('' is
-// colourless, null when Scryfall gives none) and game changer is 1, 0 or
-// null. A reversible card's faces carry their own oracle ids: each gets the
-// card's row, as the app's per-card fetch stored them (oracleIdsOf).
+// Row: [oracle id, legality, identity, game changer, edhrec rank], where
+// legality is one letter per format in `formats` order (L legal, N not
+// legal, B banned, R restricted, - not listed), identity is WUBRG letters in
+// that order ('' is colourless, null when Scryfall gives none), game changer
+// is 1, 0 or null, and edhrec rank is Scryfall's edhrec_rank (1 is the most
+// played card in Commander; null when unranked). The rank came last
+// (2026-11-03, the app's deck builder ranks suggestions by it): apps from
+// before it read the first four elements by position and never see it. A
+// reversible card's faces carry their own oracle ids: each gets the card's
+// row, as the app's per-card fetch stored them (oracleIdsOf).
 //
 // Data by Scryfall (https://scryfall.com), under its terms: the file is a
 // cache for this app's users, credited in the app.
@@ -56,10 +60,11 @@ const take = (line) => {
   const legality = FORMATS.map((f) => LETTER[c.legalities?.[f]] ?? '-').join('');
   const identity = Array.isArray(c.color_identity) ? WUBRG.filter((x) => c.color_identity.includes(x)).join('') : null;
   const gc = c.game_changer === undefined ? null : c.game_changer ? 1 : 0;
+  const rank = Number.isSafeInteger(c.edhrec_rank) && c.edhrec_rank > 0 ? c.edhrec_rank : null;
   const ids = new Set();
   if (c.oracle_id) ids.add(c.oracle_id);
   for (const face of c.card_faces ?? []) if (face.oracle_id) ids.add(face.oracle_id);
-  for (const id of ids) rows.set(id, [id, legality, identity, gc]);
+  for (const id of ids) rows.set(id, [id, legality, identity, gc, rank]);
 };
 // Split on '\n' only: Scryfall's text carries raw U+2028/2029.
 for await (const chunk of Readable.fromWeb(res.body).pipe(createGunzip())) {

@@ -11,7 +11,7 @@
 #    publishes the live price files again unchanged, so phones fetch only
 #    version.json.
 #  - facts/latest.json (scripts/build-facts.mjs: legality, colour identity,
-#    Game Changer per card) for the app's weekly facts check.
+#    Game Changer and EDHREC rank per card) for the app's weekly facts check.
 #  - home/latest.json (scripts/build-home.mjs): the Home tab's upcoming sets
 #    with their localized names, and the Secret Lair drops, from Scryfall
 #    and MTGJSON; rebuilt on every run.
