@@ -10,6 +10,14 @@
    "sigs": "pw27.bin",
    "records": 1
   },
+  "trk": {
+   "count": 446,
+   "bundleCount": 135,
+   "scryfallCount": 581,
+   "cards": "trk.json",
+   "sigs": "trk.bin",
+   "records": 446
+  },
   "trc": {
    "count": 515,
    "bundleCount": 41,
@@ -26,13 +34,13 @@
    "sigs": "sds.bin",
    "records": 29
   },
-  "trk": {
-   "count": 446,
-   "bundleCount": 135,
-   "scryfallCount": 581,
-   "cards": "trk.json",
-   "sigs": "trk.bin",
-   "records": 446
+  "pw26": {
+   "count": 1,
+   "bundleCount": 23,
+   "scryfallCount": 24,
+   "cards": "pw26.json",
+   "sigs": "pw26.bin",
+   "records": 1
   },
   "pf26": {
    "count": 2,
@@ -41,14 +49,6 @@
    "cards": "pf26.json",
    "sigs": "pf26.bin",
    "records": 2
-  },
-  "pw26": {
-   "count": 1,
-   "bundleCount": 23,
-   "scryfallCount": 24,
-   "cards": "pw26.json",
-   "sigs": "pw26.bin",
-   "records": 1
   },
   "pspl": {
    "count": 1,
@@ -75,7 +75,7 @@
    "records": 1
   },
   "sld": {
-   "count": 23,
+   "count": 28,
    "bundleCount": 2843,
    "scryfallCount": 2866,
    "cards": "sld.json",
@@ -98,9 +98,9 @@
    "bytes": 2719
   },
   "ja": {
-   "file": "ja-8f8c5fa79ef902cee7a5259bd4683168c64c70cc19f435ff42d1b64261fbe246.json",
-   "version": "8f8c5fa79ef902cee7a5259bd4683168c64c70cc19f435ff42d1b64261fbe246",
-   "bytes": 5560
+   "file": "ja-07ab1d6b7c41f03dbe82fe59a6222f37cf4d83d5be9912829f3a036efdcdab57.json",
+   "version": "07ab1d6b7c41f03dbe82fe59a6222f37cf4d83d5be9912829f3a036efdcdab57",
+   "bytes": 5614
   },
   "de": {
    "file": "de-cc39cbafe7d8d73505203dc3f31c20db0a4e453e40a4c97842999630c0454c03.json",
