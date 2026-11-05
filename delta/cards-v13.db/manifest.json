@@ -10,14 +10,6 @@
    "sigs": "pw27.bin",
    "records": 1
   },
-  "trk": {
-   "count": 446,
-   "bundleCount": 135,
-   "scryfallCount": 581,
-   "cards": "trk.json",
-   "sigs": "trk.bin",
-   "records": 446
-  },
   "sds": {
    "count": 29,
    "bundleCount": 1,
@@ -25,6 +17,14 @@
    "cards": "sds.json",
    "sigs": "sds.bin",
    "records": 29
+  },
+  "trk": {
+   "count": 451,
+   "bundleCount": 135,
+   "scryfallCount": 586,
+   "cards": "trk.json",
+   "sigs": "trk.bin",
+   "records": 451
   },
   "trc": {
    "count": 515,
