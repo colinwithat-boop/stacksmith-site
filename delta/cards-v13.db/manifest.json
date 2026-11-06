@@ -10,13 +10,13 @@
    "sigs": "pw27.bin",
    "records": 1
   },
-  "sds": {
-   "count": 29,
-   "bundleCount": 1,
-   "scryfallCount": 30,
-   "cards": "sds.json",
-   "sigs": "sds.bin",
-   "records": 29
+  "trc": {
+   "count": 515,
+   "bundleCount": 41,
+   "scryfallCount": 556,
+   "cards": "trc.json",
+   "sigs": "trc.bin",
+   "records": 515
   },
   "trk": {
    "count": 451,
@@ -26,13 +26,13 @@
    "sigs": "trk.bin",
    "records": 451
   },
-  "trc": {
-   "count": 515,
-   "bundleCount": 41,
-   "scryfallCount": 556,
-   "cards": "trc.json",
-   "sigs": "trc.bin",
-   "records": 515
+  "sds": {
+   "count": 29,
+   "bundleCount": 1,
+   "scryfallCount": 30,
+   "cards": "sds.json",
+   "sigs": "sds.bin",
+   "records": 29
   },
   "pf26": {
    "count": 2,
@@ -75,7 +75,7 @@
    "records": 1
   },
   "sld": {
-   "count": 28,
+   "count": 37,
    "bundleCount": 2843,
    "scryfallCount": 2871,
    "cards": "sld.json",
