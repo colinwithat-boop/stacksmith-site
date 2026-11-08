@@ -10,13 +10,13 @@
    "sigs": "pw27.bin",
    "records": 1
   },
-  "trc": {
-   "count": 515,
-   "bundleCount": 41,
-   "scryfallCount": 556,
-   "cards": "trc.json",
-   "sigs": "trc.bin",
-   "records": 515
+  "trk": {
+   "count": 451,
+   "bundleCount": 135,
+   "scryfallCount": 586,
+   "cards": "trk.json",
+   "sigs": "trk.bin",
+   "records": 451
   },
   "sds": {
    "count": 29,
@@ -26,21 +26,13 @@
    "sigs": "sds.bin",
    "records": 29
   },
-  "trk": {
-   "count": 451,
-   "bundleCount": 135,
-   "scryfallCount": 586,
-   "cards": "trk.json",
-   "sigs": "trk.bin",
-   "records": 451
-  },
-  "pf26": {
-   "count": 2,
-   "bundleCount": 17,
-   "scryfallCount": 19,
-   "cards": "pf26.json",
-   "sigs": "pf26.bin",
-   "records": 2
+  "trc": {
+   "count": 515,
+   "bundleCount": 41,
+   "scryfallCount": 556,
+   "cards": "trc.json",
+   "sigs": "trc.bin",
+   "records": 515
   },
   "pw26": {
    "count": 1,
@@ -49,6 +41,14 @@
    "cards": "pw26.json",
    "sigs": "pw26.bin",
    "records": 1
+  },
+  "pf26": {
+   "count": 2,
+   "bundleCount": 17,
+   "scryfallCount": 19,
+   "cards": "pf26.json",
+   "sigs": "pf26.bin",
+   "records": 2
   },
   "pspl": {
    "count": 1,
@@ -59,12 +59,12 @@
    "records": 1
   },
   "slc": {
-   "count": 30,
+   "count": 31,
    "bundleCount": 84,
-   "scryfallCount": 114,
+   "scryfallCount": 115,
    "cards": "slc.json",
    "sigs": "slc.bin",
-   "records": 30
+   "records": 31
   },
   "plst": {
    "count": 1,
@@ -75,12 +75,12 @@
    "records": 1
   },
   "sld": {
-   "count": 37,
+   "count": 38,
    "bundleCount": 2843,
-   "scryfallCount": 2880,
+   "scryfallCount": 2881,
    "cards": "sld.json",
    "sigs": "sld.bin",
-   "records": 28
+   "records": 29
   },
   "pmei": {
    "count": 3,
@@ -93,14 +93,14 @@
  },
  "locales": {
   "en": {
-   "file": "en-4d136e0a9d0f0e13b0ed7054f228f6f0fd26bd292ee97e8ee0787e95b07cb4f2.json",
-   "version": "4d136e0a9d0f0e13b0ed7054f228f6f0fd26bd292ee97e8ee0787e95b07cb4f2",
-   "bytes": 2719
+   "file": "en-5870c7b20fc4487bccc045d44a0becc8d02a1d0dc936fac0717f303b67f7d2b8.json",
+   "version": "5870c7b20fc4487bccc045d44a0becc8d02a1d0dc936fac0717f303b67f7d2b8",
+   "bytes": 2697
   },
   "ja": {
-   "file": "ja-07ab1d6b7c41f03dbe82fe59a6222f37cf4d83d5be9912829f3a036efdcdab57.json",
-   "version": "07ab1d6b7c41f03dbe82fe59a6222f37cf4d83d5be9912829f3a036efdcdab57",
-   "bytes": 5614
+   "file": "ja-4216305af0befbb71fc5c405b9785382ad6bc206544f2807125cc78eb9ab2594.json",
+   "version": "4216305af0befbb71fc5c405b9785382ad6bc206544f2807125cc78eb9ab2594",
+   "bytes": 5667
   },
   "de": {
    "file": "de-cc39cbafe7d8d73505203dc3f31c20db0a4e453e40a4c97842999630c0454c03.json",
