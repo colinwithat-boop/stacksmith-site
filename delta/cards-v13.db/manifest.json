@@ -75,52 +75,52 @@
    "records": 1
   },
   "sld": {
-   "count": 39,
+   "count": 44,
    "bundleCount": 2843,
-   "scryfallCount": 2882,
+   "scryfallCount": 2887,
    "cards": "sld.json",
    "sigs": "sld.bin",
-   "records": 30
+   "records": 35
   },
   "pmei": {
-   "count": 5,
+   "count": 6,
    "bundleCount": 113,
-   "scryfallCount": 118,
+   "scryfallCount": 119,
    "cards": "pmei.json",
    "sigs": "pmei.bin",
-   "records": 5
+   "records": 6
   }
  },
  "locales": {
   "en": {
-   "file": "en-5870c7b20fc4487bccc045d44a0becc8d02a1d0dc936fac0717f303b67f7d2b8.json",
-   "version": "5870c7b20fc4487bccc045d44a0becc8d02a1d0dc936fac0717f303b67f7d2b8",
-   "bytes": 2697
+   "file": "en-bdc6274036ae7da2328b060d1eb5b19088e76dfce4e6c7b27da5ac35d57c70f2.json",
+   "version": "bdc6274036ae7da2328b060d1eb5b19088e76dfce4e6c7b27da5ac35d57c70f2",
+   "bytes": 2710
   },
   "ja": {
-   "file": "ja-4216305af0befbb71fc5c405b9785382ad6bc206544f2807125cc78eb9ab2594.json",
-   "version": "4216305af0befbb71fc5c405b9785382ad6bc206544f2807125cc78eb9ab2594",
-   "bytes": 5667
+   "file": "ja-de7398657df240c3a70cd86f697d707cbd6730e232671214569928e214281d7c.json",
+   "version": "de7398657df240c3a70cd86f697d707cbd6730e232671214569928e214281d7c",
+   "bytes": 315515
   },
   "de": {
-   "file": "de-cc39cbafe7d8d73505203dc3f31c20db0a4e453e40a4c97842999630c0454c03.json",
-   "version": "cc39cbafe7d8d73505203dc3f31c20db0a4e453e40a4c97842999630c0454c03",
-   "bytes": 4307
+   "file": "de-fed1cb7e5d6fa77b2201e64fff8147acaa61b09e46d79a15e4401422bc12ffdb.json",
+   "version": "fed1cb7e5d6fa77b2201e64fff8147acaa61b09e46d79a15e4401422bc12ffdb",
+   "bytes": 257034
   },
   "fr": {
-   "file": "fr-71cc4ded617c58fc434bcbe66401b59b73f14a408bdb9544132917229e947215.json",
-   "version": "71cc4ded617c58fc434bcbe66401b59b73f14a408bdb9544132917229e947215",
-   "bytes": 4186
+   "file": "fr-1e428466cb98b18cd275c2daa30925fa17384f486496c033dd393b36f54e3ceb.json",
+   "version": "1e428466cb98b18cd275c2daa30925fa17384f486496c033dd393b36f54e3ceb",
+   "bytes": 259006
   },
   "es": {
-   "file": "es-7bf4b0590a492af73207aa0504feeb847c485474033cca26290ef5e17bd32173.json",
-   "version": "7bf4b0590a492af73207aa0504feeb847c485474033cca26290ef5e17bd32173",
-   "bytes": 3924
+   "file": "es-dc259355092c9ffee51370d31812fbc09b6449d2ac0113561b9b97566e016b48.json",
+   "version": "dc259355092c9ffee51370d31812fbc09b6449d2ac0113561b9b97566e016b48",
+   "bytes": 229151
   },
   "it": {
-   "file": "it-88e3666970eedd88bf55bfeccddfa9fe3783c64a9b4ac11e726897813f659953.json",
-   "version": "88e3666970eedd88bf55bfeccddfa9fe3783c64a9b4ac11e726897813f659953",
-   "bytes": 4028
+   "file": "it-27383024a5a7fe04a9bddca17c20e99f62f1431e2e1b6deb62534bbd419adea5.json",
+   "version": "27383024a5a7fe04a9bddca17c20e99f62f1431e2e1b6deb62534bbd419adea5",
+   "bytes": 229180
   },
   "pt": {
    "file": "pt-72ab0ad4a64e148709b10ebdc6de987a295b55d4d79e992d0e6a178446f56ae5.json",
