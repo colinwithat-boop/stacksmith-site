@@ -2,13 +2,37 @@
  "v": 1,
  "db": "cards-v13.db",
  "sets": {
-  "pw27": {
-   "count": 1,
+  "nau": {
+   "count": 24,
    "bundleCount": 0,
-   "scryfallCount": 1,
+   "scryfallCount": 24,
+   "cards": "nau.json",
+   "sigs": "nau.bin",
+   "records": 24
+  },
+  "nac": {
+   "count": 2,
+   "bundleCount": 0,
+   "scryfallCount": 2,
+   "cards": "nac.json",
+   "sigs": "nac.bin",
+   "records": 2
+  },
+  "pw27": {
+   "count": 4,
+   "bundleCount": 0,
+   "scryfallCount": 4,
    "cards": "pw27.json",
    "sigs": "pw27.bin",
-   "records": 1
+   "records": 4
+  },
+  "sds": {
+   "count": 29,
+   "bundleCount": 1,
+   "scryfallCount": 30,
+   "cards": "sds.json",
+   "sigs": "sds.bin",
+   "records": 29
   },
   "trc": {
    "count": 515,
@@ -26,29 +50,13 @@
    "sigs": "trk.bin",
    "records": 451
   },
-  "sds": {
-   "count": 29,
-   "bundleCount": 1,
-   "scryfallCount": 30,
-   "cards": "sds.json",
-   "sigs": "sds.bin",
-   "records": 29
-  },
   "slz": {
-   "count": 9,
+   "count": 16,
    "bundleCount": 363,
-   "scryfallCount": 372,
+   "scryfallCount": 379,
    "cards": "slz.json",
    "sigs": "slz.bin",
-   "records": 9
-  },
-  "pf26": {
-   "count": 2,
-   "bundleCount": 17,
-   "scryfallCount": 19,
-   "cards": "pf26.json",
-   "sigs": "pf26.bin",
-   "records": 2
+   "records": 16
   },
   "pw26": {
    "count": 1,
@@ -57,6 +65,14 @@
    "cards": "pw26.json",
    "sigs": "pw26.bin",
    "records": 1
+  },
+  "pf26": {
+   "count": 2,
+   "bundleCount": 17,
+   "scryfallCount": 19,
+   "cards": "pf26.json",
+   "sigs": "pf26.bin",
+   "records": 2
   },
   "pspl": {
    "count": 1,
@@ -67,28 +83,36 @@
    "records": 1
   },
   "slc": {
-   "count": 31,
+   "count": 61,
    "bundleCount": 84,
-   "scryfallCount": 115,
+   "scryfallCount": 145,
    "cards": "slc.json",
    "sigs": "slc.bin",
-   "records": 31
+   "records": 61
+  },
+  "sch": {
+   "count": 3,
+   "bundleCount": 53,
+   "scryfallCount": 56,
+   "cards": "sch.json",
+   "sigs": "sch.bin",
+   "records": 3
   },
   "plst": {
-   "count": 1,
+   "count": 2,
    "bundleCount": 5740,
-   "scryfallCount": 5741,
+   "scryfallCount": 5742,
    "cards": "plst.json",
    "sigs": "plst.bin",
-   "records": 1
+   "records": 2
   },
   "sld": {
-   "count": 44,
+   "count": 45,
    "bundleCount": 2843,
-   "scryfallCount": 2887,
+   "scryfallCount": 2888,
    "cards": "sld.json",
    "sigs": "sld.bin",
-   "records": 53
+   "records": 54
   },
   "pmei": {
    "count": 6,
