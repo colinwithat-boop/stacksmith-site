@@ -26,6 +26,14 @@
    "sigs": "pw27.bin",
    "records": 4
   },
+  "trk": {
+   "count": 451,
+   "bundleCount": 135,
+   "scryfallCount": 586,
+   "cards": "trk.json",
+   "sigs": "trk.bin",
+   "records": 451
+  },
   "sds": {
    "count": 29,
    "bundleCount": 1,
@@ -41,14 +49,6 @@
    "cards": "trc.json",
    "sigs": "trc.bin",
    "records": 515
-  },
-  "trk": {
-   "count": 451,
-   "bundleCount": 135,
-   "scryfallCount": 586,
-   "cards": "trk.json",
-   "sigs": "trk.bin",
-   "records": 451
   },
   "slz": {
    "count": 16,
@@ -75,12 +75,12 @@
    "records": 2
   },
   "pspl": {
-   "count": 1,
+   "count": 2,
    "bundleCount": 13,
-   "scryfallCount": 14,
+   "scryfallCount": 15,
    "cards": "pspl.json",
    "sigs": "pspl.bin",
-   "records": 1
+   "records": 2
   },
   "slc": {
    "count": 61,
