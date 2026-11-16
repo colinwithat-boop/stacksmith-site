@@ -11,12 +11,12 @@
    "records": 24
   },
   "nac": {
-   "count": 2,
+   "count": 4,
    "bundleCount": 0,
-   "scryfallCount": 2,
+   "scryfallCount": 4,
    "cards": "nac.json",
    "sigs": "nac.bin",
-   "records": 2
+   "records": 4
   },
   "pw27": {
    "count": 4,
@@ -34,14 +34,6 @@
    "sigs": "trk.bin",
    "records": 451
   },
-  "sds": {
-   "count": 29,
-   "bundleCount": 1,
-   "scryfallCount": 30,
-   "cards": "sds.json",
-   "sigs": "sds.bin",
-   "records": 29
-  },
   "trc": {
    "count": 515,
    "bundleCount": 41,
@@ -50,13 +42,21 @@
    "sigs": "trc.bin",
    "records": 515
   },
+  "sds": {
+   "count": 29,
+   "bundleCount": 1,
+   "scryfallCount": 30,
+   "cards": "sds.json",
+   "sigs": "sds.bin",
+   "records": 29
+  },
   "slz": {
-   "count": 16,
+   "count": 17,
    "bundleCount": 363,
-   "scryfallCount": 379,
+   "scryfallCount": 380,
    "cards": "slz.json",
    "sigs": "slz.bin",
-   "records": 16
+   "records": 17
   },
   "pw26": {
    "count": 1,
