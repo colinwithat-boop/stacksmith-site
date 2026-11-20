@@ -34,14 +34,6 @@
    "sigs": "trk.bin",
    "records": 451
   },
-  "trc": {
-   "count": 515,
-   "bundleCount": 41,
-   "scryfallCount": 556,
-   "cards": "trc.json",
-   "sigs": "trc.bin",
-   "records": 515
-  },
   "sds": {
    "count": 29,
    "bundleCount": 1,
@@ -49,6 +41,14 @@
    "cards": "sds.json",
    "sigs": "sds.bin",
    "records": 29
+  },
+  "trc": {
+   "count": 515,
+   "bundleCount": 41,
+   "scryfallCount": 556,
+   "cards": "trc.json",
+   "sigs": "trc.bin",
+   "records": 515
   },
   "slz": {
    "count": 17,
